@@ -338,6 +338,7 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
         <button data-sec="s4">04 · Мост SpectreBridge (все кнопки)</button>
         <button data-sec="s5">05 · Команды WPF → UI</button>
         <button data-sec="s6">06 · Перетаскивание окна</button>
+        <button data-sec="s7">07 · Анти-инспекция (F12, ПКМ)</button>
       </div>
       <div class="docs-body" id="docsBody">
 
@@ -397,7 +398,9 @@ public partial class MainWindow : Window
     {
         await webView.EnsureCoreWebView2Async();
         _core = webView.CoreWebView2;
-        _core.Settings.AreDefaultContextMenusEnabled = false;
+        // Защита от инспекции (раздел 07):
+        _core.Settings.AreDefaultContextMenusEnabled = false; // без «Просмотреть код» по ПКМ
+        _core.Settings.AreDevToolsEnabled = false;            // F12 вообще не откроется
 
         // 1. Мост: UI будет вызывать методы C# как spectre.Method(...)
         _core.AddHostObjectToScript("spectre", new SpectreBridge(this));
@@ -530,6 +533,22 @@ public void DragWindow() =&gt;
           <p>Кнопки <b>«Свернуть»</b> и <b>«Закрыть»</b> в шапке работают по той же схеме — они уже вызывают <span class="ic">Minimize()</span> и <span class="ic">CloseApp()</span> из раздела 04.</p>
         </div>
 
+        <div class="dsec" id="s7">
+          <h3><span class="n">07</span>Анти-инспекция: правая кнопка и F12</h3>
+          <p>Защита двухуровневая: <b>на стороне C#</b> инструменты отключаются на корню, <b>на стороне JS</b> (уже встроено в index.html) глушатся хоткеи и системное меню — работает даже в демо-режиме в браузере.</p>
+          <p><b>1. C# (основной уровень)</b> — добавь при инициализации, уже есть в разделе 03:</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>_core.Settings.AreDefaultContextMenusEnabled = false; // ПКМ не покажет «Просмотреть код»
+_core.Settings.AreDevToolsEnabled = false;            // F12 / хоткеи DevTools мертвы
+_core.Settings.IsStatusBarEnabled = false;            // без строки состояния
+_core.Settings.AreBrowserAcceleratorKeysEnabled = false; // Ctrl+W, Ctrl+T браузера не мешают</pre></div>
+          <p><b>2. JS (уже в index.html)</b> — перехватывает <span class="ic">contextmenu</span>, <span class="ic">F12</span>, <span class="ic">Ctrl+Shift+I/J/C</span>, <span class="ic">Ctrl+U</span> и крутит ловушку <span class="ic">debugger</span>: если инструменты всё же открыли, таймер замера зависает и факт фиксируется. Своё контекстное меню вкладок (ПКМ по вкладке) при этом продолжает работать — оно открывается своим обработчиком.</p>
+          <p><b>3. Дополнительно</b> — можно полностью перебить <span class="ic">window.open</span> и скрыть следы окружения:</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>window.open = null;
+// при желании — маскировать WebView2:
+Object.defineProperty(chrome, 'webview', { get: () =&gt; undefined });</pre></div>
+          <div class="tip"><b>Важно:</b> <span class="ic">AreDevToolsEnabled = false</span> — единственный надёжный способ. JS-перехват хоткеев легко обойти через меню, но меню у WebView2 нет, а системное ПКМ-меню уже отключено настройкой <span class="ic">AreDefaultContextMenusEnabled</span>.</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -603,9 +622,15 @@ $('btnFileRefresh').addEventListener('click',function(){ call('ListFiles',[]); t
 /* ================= ВКЛАДКИ ================= */
 var tabs=[],active=null,seq=1;
 function byId(id){ for(var i=0;i<tabs.length;i++) if(tabs[i].id===id) return tabs[i]; return null; }
+function byName(n){ for(var i=0;i<tabs.length;i++) if(tabs[i].name===n) return tabs[i]; return null; }
 function getActive(){ return byId(active); }
 function openTab(name,content){
   name=name||'вкладка '+seq;
+  var ex=byName(name);
+  if(ex){ /* уже открыта — просто активируем, не плодим дубли */
+    if(content!==undefined&&content!==ex.content){ ex.content=content; ex.dirty=true; }
+    setActive(ex.id); return ex;
+  }
   if(content===undefined) content=(files[name]!==undefined)?files[name]:'';
   var t={id:'t'+(seq++)+'_'+Date.now(),name:name,content:content,dirty:false};
   tabs.push(t); active=t.id; renderTabs(); syncEditor(); renderFiles(); return t;
@@ -911,6 +936,24 @@ window.addEventListener('drop',function(e){
   r.onload=function(){ files[f.name]=r.result; persistFiles(); renderFiles(); openTab(f.name,r.result); toast('Открыт: '+f.name); };
   r.readAsText(f);
 });
+
+/* ================= АНТИ-ИНСПЕКТ ================= */
+/* глушим системное контекстное меню (наше меню вкладок открывается своим обработчиком) */
+document.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+/* F12, Ctrl+Shift+I/J/C, Ctrl+U — всё мимо */
+window.addEventListener('keydown',function(e){
+  var k=(e.key||'').toUpperCase();
+  if(e.key==='F12'||
+     (e.ctrlKey&&e.shiftKey&&['I','J','C'].indexOf(k)>=0)||
+     (e.ctrlKey&&!e.shiftKey&&!e.altKey&&k==='U')){ e.preventDefault(); return; }
+});
+/* если DevTools всё-таки открыли (через C# их можно вырубить полностью) — ловушка */
+var _dbgTimer=setInterval(function(){
+  var t0=performance.now(); try{ debugger; }catch(x){}
+  if(performance.now()-t0>120){ /* дебаггер застрял — инструменты открыты */
+    document.title='SPECTRE';
+  }
+},1500);
 
 /* ================= СТАРТ ================= */
 persistFiles(); renderFiles();
