@@ -226,6 +226,45 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
   box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 20px color-mix(in srgb,var(--acc) 25%,transparent);
   opacity:0;transform:translateY(14px);pointer-events:none;transition:.25s}
 #toast.show{opacity:1;transform:translateY(0)}
+
+/* ===== сворачивание и ресайз панелей ===== */
+#sidebar{transition:width .22s ease}
+#sidebar.collapsed{width:42px!important}
+#sidebar.collapsed .side-head,#sidebar.collapsed #fileSearch,#sidebar.collapsed #fileList,#sidebar.collapsed .side-foot{display:none}
+.rail{display:none;flex-direction:column;align-items:center;gap:12px;padding:12px 0}
+#sidebar.collapsed .rail{display:flex}
+.rail button{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:var(--mut);transition:.15s}
+.rail button:hover{background:var(--bg3);color:var(--acc)}
+.rail b{writing-mode:vertical-rl;font-family:var(--disp);font-size:9px;letter-spacing:.32em;color:var(--mut);font-weight:700}
+#sideHandle{width:6px;flex:none;cursor:col-resize;position:relative;z-index:5}
+#sideHandle::after{content:'';position:absolute;top:0;bottom:0;left:2px;width:2px;border-radius:2px;background:transparent;transition:background .15s}
+#sideHandle:hover::after,#sideHandle.on::after{background:var(--acc);box-shadow:0 0 10px var(--acc)}
+#conHandle{height:6px;flex:none;cursor:row-resize;position:relative;z-index:5}
+#conHandle::after{content:'';position:absolute;left:0;right:0;top:2px;height:2px;border-radius:2px;background:transparent;transition:background .15s}
+#conHandle:hover::after,#conHandle.on::after{background:var(--acc);box-shadow:0 0 10px var(--acc)}
+#console.collapsed{height:32px!important}
+#console.collapsed #consoleBody{display:none}
+body.drag-x,body.drag-x *{cursor:col-resize!important;user-select:none}
+body.drag-y,body.drag-y *{cursor:row-resize!important;user-select:none}
+#titlebar{cursor:grab}
+#conToggle svg{transition:transform .2s}
+#console.collapsed #conToggle svg{transform:rotate(180deg)}
+
+/* ===== кастомные модалки ===== */
+#modal{position:fixed;inset:0;z-index:160;display:none;place-items:center;background:rgba(4,6,10,.72);backdrop-filter:blur(6px)}
+#modal.show{display:grid}
+.modal-box{width:min(420px,92vw);background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:22px 22px 20px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 44px color-mix(in srgb,var(--acc) 10%,transparent);
+  animation:pop .22s cubic-bezier(.2,.9,.3,1.15)}
+.modal-box.danger{border-color:color-mix(in srgb,var(--err) 45%,transparent);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 44px color-mix(in srgb,var(--err) 15%,transparent)}
+.modal-title{font-family:var(--disp);font-weight:900;font-size:14px;letter-spacing:.06em;margin-bottom:10px}
+.modal-box.danger .modal-title{color:var(--err)}
+.modal-msg{font-size:12.5px;line-height:1.8;color:var(--mut);margin-bottom:20px}
+.modal-msg b{color:var(--text)}
+.modal-btns{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.btn.danger{background:var(--err);border-color:transparent;color:#fff;box-shadow:0 4px 16px color-mix(in srgb,var(--err) 38%,transparent)}
+.btn.danger:hover{filter:brightness(1.08);border-color:transparent;box-shadow:0 6px 22px color-mix(in srgb,var(--err) 55%,transparent)}
 </style>
 </head>
 <body>
@@ -274,11 +313,19 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
         <b>ФАЙЛЫ</b><span class="cnt" id="fileCount">0</span>
         <button id="btnFileNew" title="Новый скрипт"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
         <button id="btnFileRefresh" title="Обновить"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg></button>
+        <button id="btnSideCollapse" title="Свернуть панель"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5m7 10-5-5 5-5"/></svg></button>
+      </div>
+      <div class="rail">
+        <button id="btnSideExpand" title="Развернуть файлы"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 17 5-5-5-5m7 10 5-5-5-5"/></svg></button>
+        <button id="btnRailNew" title="Новый скрипт"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        <b>ФАЙЛЫ</b>
       </div>
       <input id="fileSearch" placeholder="поиск файлов…" autocomplete="off">
       <div id="fileList"></div>
       <div class="side-foot">перетащи .lua в окно — откроется вкладка</div>
     </div>
+
+    <div id="sideHandle" title="Потяни, чтобы изменить ширину"></div>
 
     <div id="workspace">
       <div id="tabbar">
@@ -288,8 +335,11 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
       <div id="edWrap">
         <textarea id="editor" spellcheck="false" placeholder="-- Вставь сюда Lua-скрипт…&#10;-- Ctrl+Enter — выполнить, Ctrl+S — сохранить"></textarea>
       </div>
+      <div id="conHandle" title="Потяни, чтобы изменить высоту"></div>
       <div id="console">
-        <div class="con-head"><b>КОНСОЛЬ</b><button id="btnConsoleClear">очистить</button></div>
+        <div class="con-head"><b>КОНСОЛЬ</b><button id="btnConsoleClear">очистить</button>
+          <button id="conToggle" title="Свернуть / развернуть" style="margin-left:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
         <div id="consoleBody"></div>
       </div>
     </div>
@@ -358,13 +408,13 @@ dotnet add package Microsoft.Web.WebView2
 
         <div class="dsec" id="s2">
           <h3><span class="n">02</span>XAML: окно без рамки, WebView2 на всё окно</h3>
-          <p>Убираем системную шапку (<span class="ic">WindowStyle="None"</span>) и растягиваем <span class="ic">WebView2</span> на всё окно — свой тайтлбар, кнопки и перетаскивание рисует сам веб-интерфейс.</p>
+          <p>Убираем системную шапку (<span class="ic">WindowStyle="None"</span>) и растягиваем <span class="ic">WebView2</span> на всё окно — свой тайтлбар, кнопки и перетаскивание рисует сам веб-интерфейс. Размер окна зафиксирован (<span class="ic">ResizeMode="NoResize"</span>); если захочешь дать пользователю менять размер — верни <span class="ic">CanResize</span>.</p>
           <div class="codeWrap"><button class="copyBtn">копировать</button><pre>&lt;Window x:Class="Spectre.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="SPECTRE" Width="1080" Height="680"
-        WindowStyle="None" ResizeMode="CanResize"
+        WindowStyle="None" ResizeMode="NoResize"
         Background="#0b0e15" WindowStartupLocation="CenterScreen"&gt;
     &lt;Grid&gt;
         &lt;!-- WebView2 растянут на всё окно --&gt;
@@ -522,7 +572,7 @@ win.Send(new { t = "theme", vars = new Dictionary&lt;string, string&gt; {
             <li><b>2.</b> В мосте <span class="ic">DragWindow()</span> делает <span class="ic">_win.DragMove()</span>.</li>
             <li><b>3.</b> <span class="ic">DragMove()</span> <b>блокирует UI-поток до отпускания мыши</b> — так и задумано: окно «прилипает» к курсору и следует за ним, пока кнопка не отпущена.</li>
             <li><b>4.</b> Методы host-объекта уже выполняются в UI-потоке — <span class="ic">Dispatcher</span> не нужен.</li>
-            <li><b>5.</b> Изменение размера окна работает штатно (<span class="ic">ResizeMode="CanResize"</span>), WebView2 растягивается сам.</li>
+            <li><b>5.</b> Размер окна зафиксирован (<span class="ic">ResizeMode="NoResize"</span>) — интерфейс рассчитан на один размер и не поедет. Если нужно, верни <span class="ic">CanResize</span>, WebView2 растянется сам.</li>
           </ul>
           <div class="codeWrap"><button class="copyBtn">копировать</button><pre>// уже есть в SpectreBridge:
 public void DragWindow() =&gt; _win.DragMove();
@@ -553,6 +603,12 @@ Object.defineProperty(chrome, 'webview', { get: () =&gt; undefined });</pre></di
     </div>
   </div>
 </div>
+
+<div id="modal"><div class="modal-box" id="modalBox">
+  <div class="modal-title" id="mTitle"></div>
+  <div class="modal-msg" id="mMsg"></div>
+  <div class="modal-btns" id="mBtns"></div>
+</div></div>
 
 <div id="dropOverlay"><div>ОТПУСТИ — ОТКРОЮ .LUA</div></div>
 <div id="toast"></div>
@@ -607,7 +663,11 @@ function renderFiles(){
 $('fileList').addEventListener('click',function(e){
   var del=e.target.closest('[data-del]');
   if(del){ e.stopPropagation(); var n=del.getAttribute('data-del');
-    if(confirm('Удалить файл "'+n+'"?')){ delete files[n]; persistFiles(); renderFiles(); call('DeleteFile',[n]); toast('Удалено: '+n); }
+    modal({title:'Удалить файл',msg:'Файл <b>'+esc(n)+'</b> будет удалён из workspace безвозвратно.',danger:true,
+      btns:[{label:'Удалить',cls:'danger',val:'ok'},{label:'Отмена',val:'cancel'}]}).then(function(v){
+      if(v!=='ok') return;
+      delete files[n]; persistFiles(); renderFiles(); call('DeleteFile',[n]); toast('Удалено: '+n);
+    });
     return; }
   var it=e.target.closest('.file'); if(it) openTab(it.getAttribute('data-name'));
 });
@@ -647,10 +707,21 @@ function setActive(id){ active=id; renderTabs(); syncEditor(); renderFiles(); }
 function closeTab(id){
   var i=-1; for(var k=0;k<tabs.length;k++) if(tabs[k].id===id) i=k;
   if(i<0) return;
-  if(tabs[i].dirty&&!confirm('Закрыть "'+tabs[i].name+'" без сохранения?')) return;
-  tabs.splice(i,1);
-  if(active===id){ var n=tabs[i]||tabs[i-1]; active=n?n.id:null; }
-  renderTabs(); syncEditor(); renderFiles();
+  var t=tabs[i];
+  function doClose(){
+    var idx=-1; for(var k=0;k<tabs.length;k++) if(tabs[k].id===id) idx=k;
+    if(idx<0) return;
+    tabs.splice(idx,1);
+    if(active===id){ var n=tabs[idx]||tabs[idx-1]; active=n?n.id:null; }
+    renderTabs(); syncEditor(); renderFiles();
+  }
+  if(!t.dirty){ doClose(); return; }
+  modal({title:'Несохранённые изменения',msg:'Во вкладке <b>'+esc(t.name)+'</b> есть несохранённый код.',danger:true,
+    btns:[{label:'Сохранить и закрыть',cls:'primary',val:'save'},{label:'Не сохранять',cls:'danger',val:'drop'},{label:'Отмена',val:'cancel'}]
+  }).then(function(v){
+    if(v==='save'){ files[t.name]=t.content; t.dirty=false; persistFiles(); call('SaveFile',[t.name,t.content]); doClose(); }
+    else if(v==='drop'){ doClose(); }
+  });
 }
 function startRename(t){
   var el=document.querySelector('.tab[data-id="'+t.id+'"] .tname');
@@ -919,7 +990,20 @@ $('docsBody').addEventListener('click',function(e){
 /* ================= ОКНО / DRAG&DROP ================= */
 $('btnMin').addEventListener('click',function(){ call('Minimize',[]); if(!REAL) toast('Свернуть — работает в WPF (раздел 04 гида)'); });
 $('btnClose').addEventListener('click',function(){ call('CloseApp',[]); if(!REAL) toast('Закрыть — работает в WPF (раздел 04 гида)'); });
-$('titlebar').addEventListener('mousedown',function(e){ if(e.target.closest('button')) return; call('DragWindow',[]); });
+$('titlebar').addEventListener('mousedown',function(e){
+  if(e.target.closest('button')) return;
+  call('DragWindow',[]);
+  if(!REAL){
+    /* демо в браузере: пробуем сдвинуть окно через moveTo */
+    var sx=e.screenX,sy=e.screenY,ox=window.screenX,oy=window.screenY,moved=false;
+    function mv(e2){ var dx=e2.screenX-sx,dy=e2.screenY-sy;
+      if(Math.abs(dx)+Math.abs(dy)>4) moved=true;
+      try{ window.moveTo(ox+dx,oy+dy); }catch(x){} }
+    function up(){ window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up);
+      if(!moved) toast('Движение окна — в WPF через DragMove() (раздел 06 гида)'); }
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);
+  }
+});
 
 var dragDepth=0;
 window.addEventListener('dragenter',function(e){
@@ -955,8 +1039,77 @@ var _dbgTimer=setInterval(function(){
   }
 },1500);
 
+/* ================= МОДАЛКИ (замена confirm) ================= */
+function modal(o){
+  return new Promise(function(res){
+    var box=$('modalBox'); box.classList.toggle('danger',!!o.danger);
+    $('mTitle').textContent=o.title; $('mMsg').innerHTML=o.msg;
+    var wrap=$('mBtns'); wrap.innerHTML=''; var resolved=false;
+    function done(v){ if(resolved) return; resolved=true;
+      $('modal').classList.remove('show');
+      document.removeEventListener('keydown',escH);
+      $('modal').removeEventListener('mousedown',bgH);
+      res(v); }
+    function escH(e){ if(e.key==='Escape') done(o.escVal!==undefined?o.escVal:'cancel'); }
+    function bgH(e){ if(e.target===$('modal')) done('cancel'); }
+    (o.btns||[{label:'OK',val:'ok'}]).forEach(function(b,i,arr){
+      var btn=document.createElement('button');
+      btn.className='btn'+(b.cls?' '+b.cls:''); btn.textContent=b.label;
+      btn.addEventListener('click',function(){done(b.val);});
+      wrap.appendChild(btn);
+      if(i===arr.length-1) setTimeout(function(){btn.focus();},40);
+    });
+    document.addEventListener('keydown',escH);
+    $('modal').addEventListener('mousedown',bgH);
+    $('modal').classList.add('show');
+  });
+}
+
+/* ================= РЕСАЙЗ / СВОРАЧИВАНИЕ ПАНЕЛЕЙ ================= */
+var layout={side:246,con:196,sideCollapsed:false,conCollapsed:false};
+try{ var _ls=JSON.parse(localStorage.getItem('spectre.layout'));
+  if(_ls) for(var _k in layout) if(_ls[_k]!==undefined) layout[_k]=_ls[_k]; }catch(e){}
+function saveLayout(){ try{localStorage.setItem('spectre.layout',JSON.stringify(layout));}catch(e){} }
+function applyLayout(){
+  $('sidebar').style.width=layout.side+'px';
+  $('console').style.height=layout.con+'px';
+  $('sidebar').classList.toggle('collapsed',layout.sideCollapsed);
+  $('console').classList.toggle('collapsed',layout.conCollapsed);
+  $('conHandle').style.display=layout.conCollapsed?'none':'';
+}
+(function(){ /* ширина файлового менеджера */
+  var h=$('sideHandle'),sx,sw;
+  h.addEventListener('mousedown',function(e){
+    if(layout.sideCollapsed) return;
+    e.preventDefault(); sx=e.clientX; sw=layout.side;
+    document.body.classList.add('drag-x');
+    function mv(e){ layout.side=Math.max(170,Math.min(440,sw+e.clientX-sx));
+      $('sidebar').style.width=layout.side+'px'; h.classList.add('on'); }
+    function up(){ document.body.classList.remove('drag-x'); h.classList.remove('on'); saveLayout();
+      window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up); }
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);
+  });
+})();
+(function(){ /* высота консоли */
+  var h=$('conHandle'),sy,sh;
+  h.addEventListener('mousedown',function(e){
+    if(layout.conCollapsed) return;
+    e.preventDefault(); sy=e.clientY; sh=layout.con;
+    document.body.classList.add('drag-y');
+    function mv(e){ layout.con=Math.max(90,Math.min(430,sh+sy-e.clientY));
+      $('console').style.height=layout.con+'px'; h.classList.add('on'); }
+    function up(){ document.body.classList.remove('drag-y'); h.classList.remove('on'); saveLayout();
+      window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up); }
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);
+  });
+})();
+$('btnSideCollapse').addEventListener('click',function(){ layout.sideCollapsed=true; applyLayout(); saveLayout(); });
+$('btnSideExpand').addEventListener('click',function(){ layout.sideCollapsed=false; applyLayout(); saveLayout(); });
+$('btnRailNew').addEventListener('click',function(){ $('btnFileNew').click(); });
+$('conToggle').addEventListener('click',function(){ layout.conCollapsed=!layout.conCollapsed; applyLayout(); saveLayout(); });
+
 /* ================= СТАРТ ================= */
-persistFiles(); renderFiles();
+persistFiles(); renderFiles(); applyLayout();
 openTab('fly.lua');
 log(REAL?'Мост WPF найден — реальный режим':'WPF не найден — демо-режим (всё работает локально)','sys');
 log('Спектра готова. Ctrl+Enter — выполнить, «WPF-гид» — инструкция по подключению.','info');

@@ -51,7 +51,7 @@ dotnet build
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="SPECTRE" Width="1080" Height="680"
-        WindowStyle="None" ResizeMode="CanResize"
+        WindowStyle="None" ResizeMode="NoResize"
         Background="#0b0e15" WindowStartupLocation="CenterScreen">
     <Grid>
         <wv2:WebView2 x:Name="webView" DefaultBackgroundColor="#0b0e15"/>
@@ -241,7 +241,7 @@ await _core.ExecuteScriptAsync("SPECTRE.log('привет из C#','sys')");
 public void DragWindow() => _win.Dispatcher.Invoke(() => _win.DragMove());
 ```
 
-5. Ресайз окна работает штатно (`ResizeMode="CanResize"`), WebView2 растягивается сам.
+5. Размер окна зафиксирован (`ResizeMode="NoResize"`) — интерфейс рассчитан на один размер. Если нужно, верни `CanResize`, WebView2 растянется сам.
 
 ## 8. Анти-инспекция: правая кнопка и F12
 
