@@ -7,1008 +7,951 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff6a45' d='M13 2 4 14h6l-1 8 9-12h-6l1-8z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-/* ============ ЯДРО ТЕМЫ ============ */
+*{box-sizing:border-box}
 :root{
-  --bg:#0b0e15;--bg2:#10141d;--bg3:#161b27;--line:#252d3f;--line2:#1b2231;
-  --text:#dce4f4;--mut:#7e8aa8;--acc:#ff6a45;--acc2:#3ad6c6;
-  --ok:#54d98c;--warn:#f5b74e;--err:#ff5d7e;
-  --syn-k:#7cb8ff;--syn-s:#ffc66b;--syn-n:#7ef0c0;--syn-c:#5d6b8c;--syn-b:#ff9e64;
-  --fs:14px;--disp:'Unbounded',sans-serif;--mono:'JetBrains Mono',monospace;
-  --sh-acc:0 0 22px color-mix(in srgb,var(--acc) 45%,transparent);
-  --sh:0 14px 44px rgba(0,0,0,.45);
+--bg:#0a0d13;--bg2:#0f131c;--bg3:#151b28;--line:#232c3f;--line2:#1a2130;
+--text:#d9e2f3;--mut:#75819c;--acc:#ff6a45;--acc2:#35d0ba;
+--ok:#4ade80;--warn:#f0b34c;--err:#ff5d7e;
+--syn-k:#7cb8ff;--syn-s:#ffc66b;--syn-n:#67e8c9;--syn-c:#55617e;--syn-b:#ff9e64;--syn-f:#b3a1ff;
+--rad:10px;--fs:14px;
+--disp:'Unbounded',sans-serif;--ui:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;
+--sh:0 18px 50px rgba(0,0,0,.5);
+--sh-acc:0 4px 24px color-mix(in srgb,var(--acc) 38%,transparent);
 }
-body.noglow{--sh-acc:0 0 0 transparent}
-*{margin:0;padding:0;box-sizing:border-box}
-::selection{background:color-mix(in srgb,var(--acc) 35%,transparent)}
-html,body{height:100%;overflow:hidden}
-body{
-  background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12.5px;
-  display:flex;flex-direction:column;user-select:none;
-}
-/* фоновые слои: сетка + цветовые пятна */
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
-  background-size:34px 34px;opacity:.35;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 80%)}
-body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(600px 380px at 8% -6%,color-mix(in srgb,var(--acc) 13%,transparent),transparent 70%),
-             radial-gradient(700px 460px at 100% 108%,color-mix(in srgb,var(--acc2) 11%,transparent),transparent 70%)}
-#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ui);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:var(--ui);color:inherit}
+input,textarea{font-family:var(--ui);user-select:text}
 ::-webkit-scrollbar{width:9px;height:9px}
-::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px;border:2px solid transparent;background-clip:content-box}
-::-webkit-scrollbar-thumb:hover{background:var(--mut);background-clip:content-box}
-button{font-family:var(--mono);color:var(--text);background:none;border:none;cursor:pointer}
-input,select{font-family:var(--mono);color:var(--text)}
-svg{display:block}
-/* ============ ЗАГОЛОВОК ОКНА ============ */
-.titlebar{height:40px;display:flex;align-items:center;gap:12px;padding:0 10px 0 14px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--bg3) 80%,transparent),var(--bg2));
-  border-bottom:1px solid var(--line);flex:none}
-.logo{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;flex:none;
-  background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:var(--sh-acc)}
-.logo svg{width:13px;height:13px;fill:#0b0e15;animation:flick 4s infinite}
-@keyframes flick{0%,93%,100%{opacity:1}95%{opacity:.35}97%{opacity:.9}}
-.wordmark{font-family:var(--disp);font-weight:900;font-size:13px;letter-spacing:.24em}
-.wordmark em{font-style:normal;color:var(--acc)}
-.vchip{font-size:9.5px;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:2px 6px;letter-spacing:.08em}
-.modechip{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.14em;padding:3px 9px;border-radius:4px;
-  display:flex;align-items:center;gap:6px;border:1px solid var(--line)}
-.modechip i{width:6px;height:6px;border-radius:50%;background:var(--mut)}
-.modechip.wpf{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
-.modechip.wpf i{background:var(--ok);animation:pulse 1.6s infinite}
-.modechip.demo{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,var(--line))}
-.modechip.demo i{background:var(--warn);animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 45%,transparent)}70%{box-shadow:0 0 0 5px transparent}}
-.winbtn{width:30px;height:26px;border-radius:5px;display:grid;place-items:center;color:var(--mut);transition:.15s}
-.winbtn:hover{background:var(--line2);color:var(--text)}
-.winbtn.x:hover{background:var(--err);color:#fff}
-/* ============ ТУЛБАР ============ */
-.toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);
-  background:color-mix(in srgb,var(--bg2) 70%,transparent);flex:none;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:6px;font-size:11.5px;font-weight:700;
-  letter-spacing:.04em;border:1px solid var(--line);background:var(--bg3);transition:transform .12s,border-color .15s,background .15s,box-shadow .2s;white-space:nowrap}
-.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.btn:hover{border-color:var(--mut);transform:translateY(-1px)}
-.btn:active{transform:translateY(0) scale(.97)}
-.btn.primary{background:var(--acc);border-color:var(--acc);color:#0b0e15;box-shadow:var(--sh-acc)}
-.btn.primary:hover{filter:brightness(1.12)}
-.btn.attached{background:color-mix(in srgb,var(--ok) 16%,var(--bg3));border-color:var(--ok);color:var(--ok)}
-.btn.busy{pointer-events:none;opacity:.75}
-.btn.busy svg{animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btn.icon{padding:7px 9px}
-.btn.flash{animation:flashb .8s}
-@keyframes flashb{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 40%,transparent)}}
-.sep{width:1px;height:22px;background:var(--line);margin:0 4px;flex:none}
-.spacer{flex:1}
-/* ============ ОСНОВНАЯ ОБЛАСТЬ ============ */
-.main{flex:1;display:flex;min-height:0}
-/* --- файловая панель --- */
-.files{width:258px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--line);
-  background:color-mix(in srgb,var(--bg2) 55%,transparent);transition:width .25s,opacity .2s;overflow:hidden}
-.files.hide{width:0;opacity:0;border-right:none}
-.fhead{padding:10px 12px 8px;border-bottom:1px solid var(--line2);flex:none}
-.fhead .row1{display:flex;align-items:center;gap:8px}
-.ftitle{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.22em;color:var(--mut)}
-.fcount{font-size:9.5px;color:var(--acc2);border:1px solid color-mix(in srgb,var(--acc2) 40%,var(--line));border-radius:10px;padding:1px 7px}
-.fhead .acts{margin-left:auto;display:flex;gap:2px}
-.ibtn{width:24px;height:24px;border-radius:5px;display:grid;place-items:center;color:var(--mut);transition:.15s}
-.ibtn:hover{background:var(--line2);color:var(--acc)}
-.ibtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.wspath{margin-top:7px;font-size:9.5px;color:var(--mut);display:flex;gap:6px;align-items:center;cursor:pointer;
-  padding:4px 7px;border:1px dashed var(--line);border-radius:5px;transition:.15s;min-width:0}
-.wspath:hover{border-color:var(--acc);color:var(--text)}
-.wspath span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fsearch{margin:8px 12px;flex:none;position:relative}
-.fsearch input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px 7px 28px;
-  font-size:11px;outline:none;transition:.15s}
-.fsearch input:focus{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 18%,transparent)}
-.fsearch svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:12px;height:12px;stroke:var(--mut);fill:none;stroke-width:2;stroke-linecap:round}
-.flist{flex:1;overflow-y:auto;padding:4px 8px 12px}
-.file{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;transition:.13s;
-  border:1px solid transparent;animation:fadein .25s}
-@keyframes fadein{from{opacity:0;transform:translateY(4px)}}
-.file:hover{background:var(--bg3);border-color:var(--line2)}
-.file.on{background:color-mix(in srgb,var(--acc) 10%,var(--bg3));border-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
-.file .fico{width:14px;height:14px;flex:none;stroke:var(--acc2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.file .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
-.file .fsize{font-size:9px;color:var(--mut);flex:none}
-.file .facts{display:none;gap:2px;flex:none}
-.file:hover .facts{display:flex}
-.file:hover .fsize{display:none}
-.fempty{padding:26px 14px;text-align:center;color:var(--mut);font-size:10.5px;line-height:1.7}
-.fempty b{color:var(--acc)}
-.ffoot{padding:7px 12px;border-top:1px solid var(--line2);font-size:9.5px;color:var(--mut);display:flex;justify-content:space-between;flex:none}
-.collapse{position:absolute;left:258px;top:50%;z-index:5;width:14px;height:44px;transform:translateY(-50%);
-  background:var(--bg3);border:1px solid var(--line);border-left:none;border-radius:0 6px 6px 0;
-  display:grid;place-items:center;color:var(--mut);transition:.2s;cursor:pointer}
-.collapse:hover{color:var(--acc)}
-.collapse svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;transition:transform .25s}
-.collapse.off{left:0}
-.collapse.off svg{transform:rotate(180deg)}
-/* --- зона редактора --- */
-.editorzone{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
-.tabsbar{display:flex;align-items:flex-end;gap:4px;padding:7px 10px 0;background:var(--bg2);
-  border-bottom:1px solid var(--line);flex:none;overflow-x:auto;scrollbar-width:none}
-.tabsbar::-webkit-scrollbar{display:none}
-.tab{display:flex;align-items:center;gap:7px;padding:7px 11px;border-radius:7px 7px 0 0;cursor:pointer;flex:none;
-  border:1px solid transparent;border-bottom:none;color:var(--mut);font-size:11.5px;max-width:190px;
-  transition:background .15s,color .15s;position:relative;animation:tabin .22s}
-@keyframes tabin{from{opacity:0;transform:translateY(6px)}}
-.tab .dot{width:6px;height:6px;border-radius:50%;background:var(--acc2);flex:none;transition:.2s}
-.tab .tn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tab .mod{color:var(--warn);font-size:8px;line-height:1}
-.tab .tx{opacity:0;font-size:13px;line-height:1;padding:1px 3px;border-radius:4px;transition:.13s;margin-right:-4px}
-.tab:hover{background:var(--bg3);color:var(--text)}
-.tab:hover .tx{opacity:.7}
-.tab .tx:hover{opacity:1;background:var(--line);color:var(--err)}
-.tab.on{background:var(--bg);color:var(--text);border-color:var(--line)}
-.tab.on::after{content:'';position:absolute;left:8px;right:8px;top:0;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
-.tab.on .dot{background:var(--acc);box-shadow:0 0 7px var(--acc)}
-.tab.dragover{border-color:var(--acc)}
-.newtab{flex:none;width:28px;height:28px;margin-bottom:2px;border-radius:6px;display:grid;place-items:center;color:var(--mut);transition:.15s}
-.newtab:hover{background:var(--bg3);color:var(--acc);transform:rotate(90deg)}
-.newtab svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
-/* --- редактор --- */
-.edwrap{flex:1;display:flex;min-height:0;position:relative;background:var(--bg)}
-.gutter{flex:none;width:52px;overflow:hidden;background:color-mix(in srgb,var(--bg2) 60%,var(--bg));
-  border-right:1px solid var(--line2);padding:12px 0;text-align:right}
-.gutter div{font-family:var(--mono);font-size:var(--fs);line-height:1.6;color:var(--mut);padding-right:12px;
-  font-variant-ligatures:none;opacity:.55}
-.codewrap{flex:1;position:relative;min-width:0}
-.codewrap pre,.codewrap textarea{
-  position:absolute;inset:0;padding:12px 16px 40vh;font-family:var(--mono);font-size:var(--fs);line-height:1.6;
-  font-variant-ligatures:none;tab-size:2;white-space:pre;word-break:normal}
-.codewrap pre{pointer-events:none;overflow:hidden;color:var(--text);margin:0}
-.codewrap textarea{background:transparent;color:transparent;caret-color:var(--acc);border:none;outline:none;
-  resize:none;overflow:auto;user-select:text}
-.edwrap.wrap .codewrap pre,.edwrap.wrap .codewrap textarea{white-space:pre-wrap;word-break:break-word}
-.tk-k{color:var(--syn-k);font-weight:500}.tk-s{color:var(--syn-s)}.tk-n{color:var(--syn-n)}
-.tk-c{color:var(--syn-c);font-style:italic}.tk-b{color:var(--syn-b)}
-/* --- сплиттер и консоль --- */
-.splitter{height:5px;flex:none;cursor:row-resize;background:var(--line2);position:relative;transition:background .15s}
-.splitter::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:2px;border-radius:2px;background:var(--mut);opacity:.4}
-.splitter:hover,.splitter.on{background:color-mix(in srgb,var(--acc) 45%,var(--line2))}
-.console{height:196px;flex:none;display:flex;flex-direction:column;background:color-mix(in srgb,var(--bg2) 75%,transparent);min-height:70px}
-.chead{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line2);flex:none}
-.chead .ftitle{cursor:pointer}
-.ccount{font-size:9.5px;color:var(--mut)}
-.chead .acts{margin-left:auto;display:flex;gap:2px}
-.clog{flex:1;overflow-y:auto;padding:8px 12px;font-size:11.5px;line-height:1.65;user-select:text}
-.cl{display:flex;gap:9px;animation:fadein .18s}
-.cl .ct{color:var(--mut);opacity:.6;flex:none;font-size:10px;padding-top:2px}
-.cl .cb{flex:none;font-size:9px;font-weight:700;letter-spacing:.1em;padding:2px 6px;border-radius:4px;height:fit-content;margin-top:1px}
-.cl .cx{white-space:pre-wrap;word-break:break-word;min-width:0}
-.cl.out .cb{background:color-mix(in srgb,var(--acc2) 16%,transparent);color:var(--acc2)}
-.cl.sys .cb{background:color-mix(in srgb,var(--mut) 18%,transparent);color:var(--mut)}
-.cl.sys .cx{color:var(--mut)}
-.cl.ok .cb{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
-.cl.ok .cx{color:var(--ok)}
-.cl.warn .cb{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
-.cl.warn .cx{color:var(--warn)}
-.cl.err .cb{background:color-mix(in srgb,var(--err) 18%,transparent);color:var(--err)}
-.cl.err .cx{color:var(--err)}
-.cl.cmd .cb{background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc)}
-.cinput{display:flex;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid var(--line2);flex:none}
-.cinput .prm{color:var(--acc);font-weight:700}
-.cinput input{flex:1;background:none;border:none;outline:none;font-size:11.5px;color:var(--text);user-select:text}
-.cinput .cur{width:7px;height:14px;background:var(--acc);animation:blink 1s steps(1) infinite;flex:none}
-@keyframes blink{50%{opacity:0}}
-/* ============ СТАТУС-БАР ============ */
-.statusbar{height:26px;flex:none;display:flex;align-items:center;gap:14px;padding:0 12px;border-top:1px solid var(--line);
-  background:var(--bg2);font-size:10px;color:var(--mut);overflow:hidden;white-space:nowrap}
-.stitem{display:flex;align-items:center;gap:6px}
-.stitem i{width:6px;height:6px;border-radius:50%;background:var(--mut);flex:none}
-.stitem.on i{background:var(--ok);animation:pulse 1.6s infinite}
-.stitem.acc{color:var(--acc2)}
-.stitem b{color:var(--text);font-weight:500}
-/* ============ ОВЕРЛЕИ ============ */
-#drop{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--bg) 82%,transparent);display:none;place-items:center}
-#drop.on{display:grid}
-#drop .inner{border:2px dashed var(--acc);border-radius:14px;padding:44px 64px;text-align:center;
-  background:color-mix(in srgb,var(--acc) 7%,var(--bg2));box-shadow:var(--sh-acc);animation:fadein .2s}
-#drop svg{width:40px;height:40px;margin:0 auto 14px;stroke:var(--acc);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-#drop h3{font-family:var(--disp);font-size:15px;letter-spacing:.1em;margin-bottom:6px}
-#drop p{color:var(--mut);font-size:11px}
-#menu{position:fixed;z-index:70;min-width:176px;background:var(--bg3);border:1px solid var(--line);border-radius:8px;
-  padding:5px;box-shadow:var(--sh);display:none;animation:menuin .13s}
-@keyframes menuin{from{opacity:0;transform:scale(.96) translateY(-4px)}}
-#menu .mi{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:5px;cursor:pointer;font-size:11.5px;transition:.12s}
-#menu .mi:hover{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);transform:translateX(2px)}
-#menu .mi.dgr:hover{background:color-mix(in srgb,var(--err) 14%,transparent);color:var(--err)}
-#menu .mi svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#menu .mi .kbd{margin-left:auto;font-size:9px;color:var(--mut);opacity:.7}
-#menu .msep{height:1px;background:var(--line2);margin:4px 6px}
-#modal{position:fixed;inset:0;z-index:80;background:rgba(4,6,10,.66);display:none;place-items:center}
-#modal.on{display:grid}
-.mbox{width:520px;max-width:94vw;max-height:88vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--line);
-  border-radius:12px;box-shadow:var(--sh);animation:menuin .18s;user-select:auto}
-.mbox.wide{width:700px}
-.mhead{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line2)}
-.mhead h3{font-family:var(--disp);font-size:13px;letter-spacing:.14em}
-.mhead .ibtn{margin-left:auto}
-.mbody{padding:16px 18px}
-.mfoot{display:flex;justify-content:flex-end;gap:8px;padding:13px 18px;border-top:1px solid var(--line2)}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:10px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
-.field input[type=text],.field input:not([type]){width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;
-  padding:9px 11px;font-size:12px;outline:none;transition:.15s}
-.field input:focus{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 16%,transparent)}
-/* настройки */
-.swatches{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
-.sw{display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--line);border-radius:7px;cursor:pointer;
-  font-size:11px;font-weight:700;transition:.15s;background:var(--bg3)}
-.sw:hover{transform:translateY(-1px);border-color:var(--mut)}
-.sw.on{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 16%,transparent)}
-.sw .dots{display:flex}
-.sw .dots i{width:10px;height:10px;border-radius:50%;margin-left:-3px;border:1px solid rgba(0,0,0,.3)}
-.setsec{font-family:var(--disp);font-size:10px;letter-spacing:.2em;color:var(--mut);margin:18px 0 10px;display:flex;align-items:center;gap:10px}
-.setsec::after{content:'';flex:1;height:1px;background:var(--line2)}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
-.cfield{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--line2);border-radius:6px;padding:5px 8px}
-.cfield input[type=color]{width:26px;height:22px;border:none;background:none;padding:0;cursor:pointer}
-.cfield span{font-size:10px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rangerow{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--line2);border-radius:6px;padding:8px 11px;margin-bottom:9px}
-.rangerow span{font-size:10.5px;color:var(--mut);flex:1}
-.rangerow b{font-size:11px;color:var(--acc);min-width:34px;text-align:right}
-input[type=range]{accent-color:var(--acc);flex:1;max-width:170px}
-input[type=checkbox]{accent-color:var(--acc);width:14px;height:14px;cursor:pointer}
-.proto{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:12px;font-size:10px;line-height:1.8;color:var(--mut);user-select:text}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--mut);border:2px solid transparent;background-clip:padding-box}
+::selection{background:color-mix(in srgb,var(--acc) 32%,transparent)}
+
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+radial-gradient(1100px 640px at 88% -12%,color-mix(in srgb,var(--acc) 10%,transparent),transparent 62%),
+radial-gradient(950px 720px at -8% 112%,color-mix(in srgb,var(--acc2) 9%,transparent),transparent 62%),var(--bg)}
+#bg .grid{position:absolute;inset:0;opacity:.45;background-image:
+linear-gradient(color-mix(in srgb,var(--line) 36%,transparent) 1px,transparent 1px),
+linear-gradient(90deg,color-mix(in srgb,var(--line) 36%,transparent) 1px,transparent 1px);
+background-size:38px 38px;mask-image:radial-gradient(ellipse at 50% 38%,#000 28%,transparent 78%);-webkit-mask-image:radial-gradient(ellipse at 50% 38%,#000 28%,transparent 78%)}
+#bg .orb{position:absolute;width:540px;height:540px;border-radius:50%;filter:blur(95px);opacity:.32;animation:drift 17s ease-in-out infinite alternate}
+#bg .o1{background:var(--acc);top:-190px;right:-130px}
+#bg .o2{background:var(--acc2);bottom:-230px;left:-150px;animation-delay:-8.5s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-65px,55px) scale(1.16)}}
+body.noglow #bg .orb{display:none}
+
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;user-select:none}
+
+#titlebar{height:46px;flex:none;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--line);
+background:linear-gradient(180deg,color-mix(in srgb,var(--bg2) 94%,transparent),color-mix(in srgb,var(--bg2) 78%,transparent));backdrop-filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:9px}
+.logo svg{width:21px;height:21px;color:var(--acc);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--acc) 60%,transparent))}
+.logo b{font-family:var(--disp);font-weight:900;font-size:13px;letter-spacing:3px}
+.logo .ver{font-family:var(--mono);font-size:9.5px;color:var(--mut);border:1px solid var(--line);padding:2px 7px;border-radius:99px;letter-spacing:1px}
+#btnWorkspace{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--mut);background:var(--bg3);border:1px solid var(--line);padding:5px 11px;border-radius:99px;cursor:pointer;transition:.15s;max-width:340px}
+#btnWorkspace span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#btnWorkspace:hover{color:var(--text);border-color:color-mix(in srgb,var(--acc) 55%,var(--line))}
+#btnWorkspace svg{width:12px;height:12px;flex:none;color:var(--acc2)}
+.tstat{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--mut);margin-left:auto;cursor:default}
+.tstat i{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:none;transition:.3s}
+.tstat.on i{background:var(--ok);box-shadow:0 0 10px color-mix(in srgb,var(--ok) 70%,transparent);animation:blink 2.2s ease-in-out infinite}
+.tstat.off i{background:var(--err)}
+@keyframes blink{50%{opacity:.45}}
+.winbtns{display:flex;gap:6px}
+.wbtn{width:30px;height:28px;display:grid;place-items:center;background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;color:var(--mut);transition:.15s}
+.wbtn:hover{background:var(--bg3);color:var(--text);border-color:var(--line)}
+.wbtn.x:hover{background:color-mix(in srgb,var(--err) 18%,var(--bg3));color:var(--err);border-color:color-mix(in srgb,var(--err) 40%,var(--line))}
+.wbtn svg{width:14px;height:14px}
+
+#tabbar{flex:none;display:flex;align-items:flex-end;gap:4px;padding:9px 12px 0;position:relative}
+#tabbar::after{content:'';position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;opacity:.55;
+background:linear-gradient(90deg,var(--acc),var(--acc2),var(--acc));background-size:200% 100%;animation:flow 7s linear infinite}
+@keyframes flow{to{background-position:200% 0}}
+#tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;align-items:flex-end}
+#tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:8px;padding:7px 11px 8px;font-size:12.5px;font-weight:500;color:var(--mut);
+background:transparent;border:1px solid transparent;border-bottom:none;border-radius:var(--rad) var(--rad) 0 0;cursor:default;
+position:relative;white-space:nowrap;max-width:210px;transition:background .15s,color .15s;animation:tabIn .18s ease;flex:none}
+@keyframes tabIn{from{opacity:0;transform:translateY(5px)}}
+.tab:hover{background:color-mix(in srgb,var(--bg3) 75%,transparent);color:var(--text)}
+.tab.active{background:var(--bg3);border-color:var(--line);color:var(--text)}
+.tab.active::before{content:'';position:absolute;top:-1px;left:8px;right:8px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.tab .tname{overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:11.5px}
+.tab.dirty .tname::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--warn);margin-right:7px;vertical-align:1px}
+.tab .tx{width:17px;height:17px;flex:none;display:grid;place-items:center;border:none;background:transparent;border-radius:5px;color:var(--mut);font-size:13px;line-height:1;cursor:pointer;opacity:0;transition:.12s;padding:0}
+.tab:hover .tx,.tab.active .tx{opacity:.75}
+.tab .tx:hover{background:color-mix(in srgb,var(--err) 25%,transparent);color:var(--err);opacity:1}
+.tab .tedit{width:110px;background:var(--bg);border:1px solid var(--acc);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:11.5px;padding:2px 6px;outline:none}
+.tab.dl{box-shadow:inset 3px 0 0 var(--acc)}
+.tab.dr{box-shadow:inset -3px 0 0 var(--acc)}
+#btnNewTab{flex:none;width:28px;height:28px;margin-bottom:3px;display:grid;place-items:center;background:transparent;border:1px dashed var(--line);border-radius:9px;color:var(--mut);font-size:16px;cursor:pointer;transition:.15s;padding:0}
+#btnNewTab:hover{color:var(--acc);border-color:var(--acc);transform:rotate(90deg)}
+
+#toolbar{flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);
+background:color-mix(in srgb,var(--bg2) 86%,transparent);backdrop-filter:blur(8px)}
+.tbtn{position:relative;overflow:hidden;display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;letter-spacing:.2px;
+padding:8px 14px;border-radius:var(--rad);border:1px solid var(--line);background:var(--bg3);color:var(--text);cursor:pointer;
+transition:transform .12s,border-color .15s,filter .15s,background .15s}
+.tbtn svg{width:14px;height:14px;flex:none}
+.tbtn:hover{border-color:color-mix(in srgb,var(--acc) 55%,var(--line));transform:translateY(-1px)}
+.tbtn:active{transform:scale(.965)}
+.tbtn.exec{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 68%,var(--acc2)));border-color:transparent;color:#fff;box-shadow:var(--sh-acc)}
+.tbtn.exec:hover{filter:brightness(1.1);border-color:transparent}
+.tbtn.attach.on{border-color:color-mix(in srgb,var(--ok) 60%,var(--line));color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--bg3))}
+.tbtn.attach.busy{pointer-events:none;opacity:.85}
+.tbtn .prog{position:absolute;left:0;bottom:0;height:2.5px;width:0;background:var(--acc2);transition:width .06s linear}
+.tbtn.pulse{animation:pul .55s ease}
+@keyframes pul{40%{box-shadow:0 0 0 8px color-mix(in srgb,var(--acc2) 22%,transparent)}}
+.sep{width:1px;height:22px;background:var(--line);flex:none}
+.grow{flex:1}
+.icon-btn{width:31px;height:31px;flex:none;display:grid;place-items:center;background:transparent;border:1px solid transparent;border-radius:9px;color:var(--mut);cursor:pointer;transition:.15s;padding:0}
+.icon-btn:hover{background:var(--bg3);border-color:var(--line);color:var(--text)}
+.icon-btn:active{transform:scale(.92)}
+.icon-btn svg{width:15px;height:15px}
+.icon-btn.small{width:26px;height:26px}
+.icon-btn.small svg{width:13px;height:13px}
+
+#main{flex:1;display:flex;min-height:0}
+#sidebar{width:252px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--line);
+background:color-mix(in srgb,var(--bg2) 88%,transparent);transition:width .25s ease,opacity .2s;overflow:hidden}
+body.nosb #sidebar{width:0;opacity:0;border-right:none}
+.sb-head{flex:none;padding:11px 11px 8px;display:flex;flex-direction:column;gap:8px}
+.sb-row{display:flex;align-items:center;gap:4px}
+.sb-title{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--mut);text-transform:uppercase;margin-right:auto}
+#fileSearch{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:12px;padding:7px 11px;outline:none;transition:border-color .15s}
+#fileSearch:focus{border-color:color-mix(in srgb,var(--acc) 60%,var(--line))}
+#fileSearch::placeholder{color:var(--mut)}
+#fileList{flex:1;overflow-y:auto;padding:2px 6px 8px}
+.frow{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:8px;border-left:2px solid transparent;cursor:default;transition:.12s;animation:tabIn .16s ease}
+.frow:hover{background:var(--bg3)}
+.frow.sel{border-left-color:var(--acc);background:color-mix(in srgb,var(--acc) 9%,transparent)}
+.frow .fic{width:14px;height:14px;flex:none;color:var(--acc2)}
+.frow .fname{flex:1;font-family:var(--mono);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow .fts{font-family:var(--mono);font-size:9.5px;color:var(--mut);opacity:.75;flex:none}
+.frow .facts{display:flex;gap:2px;opacity:0;transition:.12s;flex:none}
+.frow:hover .facts{opacity:1}
+.fact{width:22px;height:22px;display:grid;place-items:center;background:transparent;border:none;border-radius:6px;color:var(--mut);cursor:pointer;padding:0;transition:.12s}
+.fact:hover{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--text)}
+.fact.danger:hover{background:color-mix(in srgb,var(--err) 20%,transparent);color:var(--err)}
+.fact svg{width:12px;height:12px}
+.fempty{padding:26px 12px;text-align:center;color:var(--mut);font-size:12px;line-height:1.7}
+.sb-foot{flex:none;display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10px;color:var(--mut)}
+.sb-foot span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+#workspace{flex:1;display:flex;flex-direction:column;min-width:0}
+#editorWrap{flex:1;position:relative;min-height:0;margin:11px 13px 0;border:1px solid var(--line);border-radius:var(--rad);
+background:color-mix(in srgb,var(--bg) 80%,var(--bg2));overflow:hidden;transition:border-color .2s,box-shadow .2s}
+#editorWrap:focus-within{border-color:color-mix(in srgb,var(--acc) 55%,var(--line));box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 12%,transparent)}
+#gutter{position:absolute;top:0;bottom:0;left:0;padding:14px 10px 14px 0;text-align:right;font-family:var(--mono);font-size:var(--fs);line-height:1.6;
+color:color-mix(in srgb,var(--mut) 75%,transparent);overflow:hidden;border-right:1px solid var(--line2);background:color-mix(in srgb,var(--bg) 55%,var(--bg2));white-space:pre}
+#hlCode{position:absolute;top:0;bottom:0;left:0;right:0;margin:0;padding:14px 18px;font-family:var(--mono);font-weight:500;font-size:var(--fs);line-height:1.6;
+white-space:pre;overflow:hidden;color:var(--text);pointer-events:none}
+#editor{position:absolute;top:0;bottom:0;left:0;right:0;padding:14px 18px;border:none;outline:none;resize:none;background:transparent;
+font-family:var(--mono);font-weight:500;font-size:var(--fs);line-height:1.6;color:transparent;caret-color:var(--text);white-space:pre;overflow:auto;tab-size:2}
+#editor::placeholder{color:var(--mut)}
+.tk-c{color:var(--syn-c);font-style:italic}
+.tk-s{color:var(--syn-s)}
+.tk-n{color:var(--syn-n)}
+.tk-k{color:var(--syn-k);font-weight:700}
+.tk-b{color:var(--syn-b)}
+.tk-f{color:var(--syn-f)}
+.tk-o{color:color-mix(in srgb,var(--mut) 72%,var(--text))}
+
+#console{flex:none;height:196px;margin:10px 13px 12px;border:1px solid var(--line);border-radius:var(--rad);
+background:color-mix(in srgb,var(--bg2) 90%,transparent);display:flex;flex-direction:column;overflow:hidden;transition:height .25s ease}
+#console.collapsed{height:39px}
+#conHead{flex:none;height:38px;display:flex;align-items:center;gap:6px;padding:0 8px 0 13px;border-bottom:1px solid var(--line2)}
+#console.collapsed #conHead{border-bottom-color:transparent}
+.chip-f{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3.5px 10px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer;transition:.15s}
+.chip-f:hover{color:var(--text);border-color:var(--mut)}
+.chip-f.on{background:var(--acc);border-color:transparent;color:#fff}
+#conBody{flex:1;overflow-y:auto;padding:8px 13px;font-family:var(--mono);font-size:12.5px;line-height:1.6}
+.ce{display:flex;gap:11px;padding:1px 0;animation:ceIn .18s ease}
+@keyframes ceIn{from{opacity:0;transform:translateY(4px)}}
+.ce .ct{color:var(--mut);opacity:.55;font-size:10px;min-width:60px;padding-top:2.5px;flex:none}
+.ce.info .cm{color:var(--text)}
+.ce.warn .cm{color:var(--warn)}
+.ce.error .cm{color:var(--err)}
+.ce.cmd .cm{color:var(--acc2)}
+.ce.sys .cm{color:var(--mut);font-style:italic}
+.cm{white-space:pre-wrap;word-break:break-word}
+#conInput{flex:none;display:flex;align-items:center;gap:9px;padding:0 13px;border-top:1px solid var(--line2)}
+#conInput b{color:var(--acc2);font-family:var(--mono);font-size:13px}
+#cmdInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:12.5px;padding:9px 0}
+#cmdInput::placeholder{color:color-mix(in srgb,var(--mut) 65%,transparent)}
+#console.collapsed #conBody,#console.collapsed #conInput{display:none}
+
+#statusbar{flex:none;height:30px;display:flex;align-items:center;gap:13px;padding:0 13px;border-top:1px solid var(--line);
+background:color-mix(in srgb,var(--bg2) 92%,transparent);font-size:11px;color:var(--mut)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);padding:2px 9px;border-radius:99px;font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:transparent;cursor:default}
+#sbMode.demo{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+#sbMode.bridge{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+#sbTimer{font-family:var(--mono);color:var(--ok)}
+#sbFile{font-family:var(--mono);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:26vw}
+#sbCaret{font-family:var(--mono);font-size:10.5px}
+#sbTheme{cursor:pointer;transition:.15s;color:var(--mut)}
+#sbTheme:hover{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 55%,var(--line))}
+#sbClock{font-family:var(--mono);font-size:10.5px}
+
+#drawer{position:fixed;top:0;right:0;bottom:0;width:336px;z-index:60;border-left:1px solid var(--line);
+background:color-mix(in srgb,var(--bg2) 93%,transparent);backdrop-filter:blur(16px);transform:translateX(105%);transition:transform .32s cubic-bezier(.2,.8,.25,1);display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+#scrim{position:fixed;inset:0;z-index:55;background:rgba(4,6,11,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+#scrim.show{opacity:1;pointer-events:auto}
+.dr-head{flex:none;display:flex;align-items:center;justify-content:space-between;padding:15px 17px;border-bottom:1px solid var(--line)}
+.dr-head b{font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:2.5px}
+.dr-body{flex:1;overflow-y:auto;padding:0 17px 28px}
+.dr-label{font-family:var(--disp);font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut);margin:20px 0 11px}
+#skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.skin{display:block;text-align:left;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--bg3);cursor:pointer;transition:.16s}
+.skin:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--acc) 55%,var(--line))}
+.skin.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 6px 20px color-mix(in srgb,var(--acc) 22%,transparent)}
+.skin .sw{display:flex;gap:4px;margin-bottom:9px}
+.skin .sw i{width:15px;height:15px;border-radius:50%;border:1px solid rgba(255,255,255,.14);display:block}
+.skin .sn{font-family:var(--disp);font-size:9px;font-weight:700;letter-spacing:1.6px;color:var(--text)}
+.vrow{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+.vrow label{font-size:12px;color:var(--mut)}
+.vrow input[type=color]{width:42px;height:27px;border:1px solid var(--line);border-radius:8px;background:var(--bg3);padding:2px;cursor:pointer}
+.vrow input[type=range]{width:150px;accent-color:var(--acc)}
+.vrow output{font-family:var(--mono);font-size:10.5px;color:var(--text);width:38px;text-align:right}
+.vcheck{display:flex;align-items:center;gap:9px;margin:12px 0;font-size:12px;color:var(--mut);cursor:pointer}
+.vcheck input{accent-color:var(--acc);width:15px;height:15px}
+.dr-btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.mbtn{padding:8px 15px;border-radius:9px;border:1px solid var(--line);background:var(--bg3);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.mbtn:hover{border-color:color-mix(in srgb,var(--acc) 55%,var(--line));transform:translateY(-1px)}
+.mbtn:active{transform:scale(.96)}
+.mbtn.primary{background:var(--acc);border-color:transparent;color:#fff;box-shadow:var(--sh-acc)}
+.mbtn.primary:hover{filter:brightness(1.08)}
+.proto{font-family:var(--mono);font-size:10px;line-height:1.75;color:var(--mut);background:var(--bg);border:1px solid var(--line2);border-radius:9px;padding:11px 13px;white-space:pre-wrap;word-break:break-word}
 .proto b{color:var(--acc2);font-weight:500}
-.proto code{color:var(--syn-s)}
-/* тосты */
-#toasts{position:fixed;right:16px;bottom:34px;z-index:90;display:flex;flex-direction:column;gap:8px}
-.toast{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--line);border-left:3px solid var(--acc2);
-  border-radius:7px;padding:10px 14px;font-size:11.5px;box-shadow:var(--sh);animation:toastin .25s;max-width:320px}
-.toast.ok{border-left-color:var(--ok)}.toast.err{border-left-color:var(--err)}.toast.warn{border-left-color:var(--warn)}
-.toast.out{animation:toastout .3s forwards}
-@keyframes toastin{from{opacity:0;transform:translateX(30px)}}
-@keyframes toastout{to{opacity:0;transform:translateX(30px)}}
+
+#modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(4,6,11,.58);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s}
+#modal.open{opacity:1;pointer-events:auto}
+.m-box{width:min(420px,92vw);background:var(--bg2);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:var(--sh);transform:scale(.95);transition:transform .2s}
+#modal.open .m-box{transform:scale(1)}
+.m-title{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:1px}
+.m-text{font-size:13px;color:var(--mut);margin:11px 0 17px;line-height:1.55}
+.minput{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--text);font-family:var(--mono);font-size:12.5px;padding:10px 12px;outline:none;margin-bottom:17px;transition:border-color .15s}
+.minput:focus{border-color:var(--acc)}
+textarea.minput{min-height:110px;resize:vertical;line-height:1.6}
+.m-btns{display:flex;justify-content:flex-end;gap:8px}
+
+#ctx{position:fixed;z-index:90;min-width:176px;background:color-mix(in srgb,var(--bg2) 96%,transparent);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:11px;padding:5px;box-shadow:var(--sh);display:none}
+#ctx.open{display:block;animation:pop .13s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}}
+.ci{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;font-size:12.5px;cursor:pointer;color:var(--text);transition:.1s}
+.ci:hover{background:var(--bg3)}
+.ci.danger{color:var(--err)}
+.ci.danger:hover{background:color-mix(in srgb,var(--err) 16%,transparent)}
+.ci svg{width:13px;height:13px;color:var(--mut)}
+.ci.danger svg{color:var(--err)}
+.csep{height:1px;background:var(--line);margin:5px 7px}
+
+#toasts{position:fixed;right:17px;bottom:42px;z-index:95;display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;max-width:360px;background:color-mix(in srgb,var(--bg2) 94%,transparent);backdrop-filter:blur(12px);
+border:1px solid var(--line);border-left:3px solid var(--mut);border-radius:11px;padding:11px 15px;font-size:12.5px;box-shadow:var(--sh);animation:tIn .26s cubic-bezier(.2,.8,.3,1.1);transition:opacity .3s,transform .3s}
+@keyframes tIn{from{opacity:0;transform:translateX(28px)}}
+.toast.out{opacity:0;transform:translateX(24px)}
+.toast .tdot{width:8px;height:8px;border-radius:50%;flex:none}
+.toast.ok{border-left-color:var(--ok)}.toast.ok .tdot{background:var(--ok);box-shadow:0 0 9px var(--ok)}
+.toast.warn{border-left-color:var(--warn)}.toast.warn .tdot{background:var(--warn);box-shadow:0 0 9px var(--warn)}
+.toast.err{border-left-color:var(--err)}.toast.err .tdot{background:var(--err);box-shadow:0 0 9px var(--err)}
+.toast.info{border-left-color:var(--acc2)}.toast.info .tdot{background:var(--acc2);box-shadow:0 0 9px var(--acc2)}
+
+#dropHint{position:fixed;inset:12px;z-index:70;display:none;place-items:center;border:2px dashed var(--acc);border-radius:18px;
+background:color-mix(in srgb,var(--acc) 8%,rgba(4,6,11,.55));backdrop-filter:blur(3px)}
+#dropHint.show{display:grid}
+#dropHint div{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--text)}
+#dropHint svg{width:44px;height:44px;color:var(--acc);animation:drift 3s ease-in-out infinite alternate}
 </style>
 </head>
 <body>
+<div id="bg"><div class="grid"></div><div class="orb o1"></div><div class="orb o2"></div></div>
+
 <div id="app">
-  <!-- заголовок окна -->
-  <header class="titlebar">
-    <div class="logo"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
-    <div class="wordmark">SPE<em>C</em>TRE</div>
-    <span class="vchip">v1.0.7</span>
-    <div class="modechip demo" id="modechip"><i></i><span id="modetxt">DEMO</span></div>
-    <button class="winbtn" data-act="min" title="Свернуть"><svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16"/></svg></button>
-    <button class="winbtn x" data-act="close" title="Закрыть"><svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+  <header id="titlebar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+      <b>SPECTRE</b><span class="ver">v2.4.1</span>
+    </div>
+    <button id="btnWorkspace" title="Открыть папку workspace">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+      <span id="wsPathTop">~\SPECTRE\workspace</span>
+    </button>
+    <div class="tstat" id="connPill" title="Статус подключения"><i></i><span id="connText">не подключено</span></div>
+    <div class="grow"></div>
+    <div class="winbtns">
+      <button class="wbtn" id="btnMin" title="Свернуть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <button class="wbtn x" id="btnClose" title="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
   </header>
 
-  <!-- тулбар -->
-  <div class="toolbar">
-    <button class="btn primary" data-act="exec" id="execbtn"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>ВЫПОЛНИТЬ</button>
-    <button class="btn" data-act="attach" id="attachbtn"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg><span id="attachtxt">Подключить</span></button>
-    <button class="btn" data-act="kill"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>Стоп</button>
-    <div class="sep"></div>
-    <button class="btn icon" data-act="save" title="Сохранить (Ctrl+S)"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></button>
-    <button class="btn icon" data-act="newtab" title="Новая вкладка (Ctrl+T)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button class="btn" data-act="snippets"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"/></svg>Сниппеты</button>
-    <div class="sep"></div>
-    <button class="btn" data-act="procs" id="procbtn"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg><span id="proctxt">Процесс…</span></button>
-    <div class="spacer"></div>
-    <button class="btn icon" data-act="cycletheme" id="themebtn" title="Сменить тему"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
-    <button class="btn icon" data-act="settings" title="Настройки"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3H9.8l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4.4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"/></svg></button>
+  <div id="tabbar">
+    <div id="tabs"></div>
+    <button id="btnNewTab" title="Новая вкладка (Ctrl+T)">+</button>
   </div>
 
-  <!-- основная область -->
-  <div class="main">
-    <div class="collapse" id="collapse" title="Свернуть панель"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
-    <aside class="files" id="filespane">
-      <div class="fhead">
-        <div class="row1">
-          <span class="ftitle">СКРИПТЫ</span><span class="fcount" id="fcount">0</span>
-          <span class="acts">
-            <button class="ibtn" data-act="newfile" title="Новый файл"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-            <button class="ibtn" data-act="openfolder" title="Открыть папку в проводнике"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
-            <button class="ibtn" data-act="refreshfiles" title="Обновить"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6"/></svg></button>
-          </span>
+  <div id="toolbar">
+    <button class="tbtn attach" id="btnAttach" title="Подключиться к процессу Roblox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+      <span id="attachLabel">Подключить</span><div class="prog" id="attachProg"></div>
+    </button>
+    <button class="tbtn exec" id="btnExec" title="Выполнить (Ctrl+Enter)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3.5v17l14-8.5z"/></svg>
+      Выполнить
+    </button>
+    <span class="sep"></span>
+    <button class="tbtn" id="btnSave" title="Сохранить (Ctrl+S)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+      Сохранить
+    </button>
+    <button class="tbtn" id="btnSaveAs" title="Сохранить как…">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
+      Сохранить как
+    </button>
+    <button class="tbtn" id="btnImport" title="Импортировать .lua с диска">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      Импорт .lua
+    </button>
+    <span class="grow"></span>
+    <button class="icon-btn" id="btnSidebar" title="Файловый менеджер">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+    </button>
+    <button class="icon-btn" id="btnTheme" title="Скины">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSettings" title="Настройки и бэкенд">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <div id="main">
+    <aside id="sidebar">
+      <div class="sb-head">
+        <div class="sb-row">
+          <span class="sb-title">Скрипты</span>
+          <button class="icon-btn small" id="btnRefresh" title="Обновить список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+          <button class="icon-btn small" id="btnNewFile" title="Новый скрипт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6"/><path d="M9 15h6"/></svg></button>
+          <button class="icon-btn small" id="btnOpenFolder" title="Открыть папку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
-        <div class="wspath" id="wspath" data-act="editws" title="Сменить рабочую папку">
-          <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          <span id="wstxt">…</span>
-        </div>
+        <input id="fileSearch" placeholder="Поиск скриптов…">
       </div>
-      <div class="fsearch">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="fsearch" placeholder="Поиск скриптов…" spellcheck="false">
-      </div>
-      <div class="flist" id="flist"></div>
-      <div class="ffoot"><span id="fstats">—</span><span>workspace</span></div>
+      <div id="fileList"></div>
+      <div class="sb-foot"><span id="fileCount">0 файлов</span><span id="wsPath">workspace</span></div>
     </aside>
 
-    <section class="editorzone">
-      <div class="tabsbar" id="tabsbar"></div>
-      <div class="edwrap" id="edwrap">
-        <div class="gutter"><div id="gut"></div></div>
-        <div class="codewrap">
-          <pre id="hlpre" aria-hidden="true"></pre>
-          <textarea id="code" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-        </div>
+    <section id="workspace">
+      <div id="editorWrap">
+        <div id="gutter">1</div>
+        <pre id="hlCode" aria-hidden="true"></pre>
+        <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="-- Вставь Lua-код или перетащи .lua файл сюда"></textarea>
       </div>
-      <div class="splitter" id="splitter"></div>
-      <div class="console" id="console">
-        <div class="chead">
-          <span class="ftitle" data-act="togglecon">КОНСОЛЬ</span>
-          <span class="ccount" id="ccount">0 строк</span>
-          <span class="acts">
-            <button class="ibtn" data-act="copylog" title="Копировать лог"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
-            <button class="ibtn" data-act="autoscroll" id="asbtn" title="Автопрокрутка"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
-            <button class="ibtn" data-act="clearcon" title="Очистить"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
-          </span>
+      <div id="console">
+        <div id="conHead">
+          <span class="sb-title">Консоль</span>
+          <button class="chip-f on" data-f="all">все</button>
+          <button class="chip-f" data-f="info">info</button>
+          <button class="chip-f" data-f="warn">warn</button>
+          <button class="chip-f" data-f="error">error</button>
+          <span class="grow"></span>
+          <button class="icon-btn small" id="btnCopyCon" title="Копировать консоль"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <button class="icon-btn small" id="btnClearCon" title="Очистить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <button class="icon-btn small" id="btnConToggle" title="Свернуть консоль"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
         </div>
-        <div class="clog" id="clog"></div>
-        <div class="cinput">
-          <span class="prm">&gt;</span>
-          <input id="cinput" placeholder="Быстрая команда Lua → Enter" spellcheck="false">
-          <span class="cur"></span>
-        </div>
+        <div id="conBody"></div>
+        <div id="conInput"><b>›</b><input id="cmdInput" placeholder="Lua-команда… (Enter — выполнить)" spellcheck="false"></div>
       </div>
     </section>
   </div>
 
-  <!-- статус-бар -->
-  <footer class="statusbar">
-    <span class="stitem" id="stattach"><i></i><b id="stattachtxt">не подключено</b></span>
-    <span class="stitem acc" id="stproc">процесс: —</span>
-    <span class="stitem">тема: <b id="sttheme">—</b></span>
-    <span class="spacer"></span>
-    <span class="stitem" id="stexec">—</span>
-    <span class="stitem" id="stcaret">Стр 1, Стлб 1</span>
-    <span class="stitem" id="stchars">0 симв.</span>
-    <span class="stitem"><b id="stclock">00:00:00</b></span>
+  <footer id="statusbar">
+    <span class="chip" id="sbMode">demo</span>
+    <span id="sbConn">мост не найден</span>
+    <span id="sbTimer"></span>
+    <span class="grow"></span>
+    <span id="sbFile"></span>
+    <span id="sbCaret">Ln 1, Col 1</span>
+    <button class="chip" id="sbTheme" title="Сменить скин">Плазма</button>
+    <span id="sbClock"></span>
   </footer>
 </div>
 
-<!-- оверлеи -->
-<div id="drop"><div class="inner">
-  <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-  <h3>БРОСИТЬ СКРИПТ</h3><p>.lua / .luau / .txt — откроется в новой вкладке</p>
-</div></div>
-<div id="menu"></div>
-<div id="modal"></div>
+<div id="scrim"></div>
+<div id="drawer">
+  <div class="dr-head"><b>СКИНЫ И ТЕМЫ</b>
+    <button class="icon-btn" id="btnDrawerClose" title="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dr-body">
+    <div class="dr-label">Готовые скины</div>
+    <div id="skinGrid"></div>
+    <div class="dr-label">Своя тема</div>
+    <div id="varGrid"></div>
+    <div class="vrow"><label>Скругление углов</label><input type="range" id="rngRad" min="0" max="18" value="10"><output id="outRad">10px</output></div>
+    <div class="vrow"><label>Размер шрифта кода</label><input type="range" id="rngFs" min="12" max="18" value="14"><output id="outFs">14px</output></div>
+    <label class="vcheck"><input type="checkbox" id="tglGlow" checked> Фоновое свечение</label>
+    <div class="dr-btns">
+      <button class="mbtn" id="btnThemeExport">Экспорт JSON</button>
+      <button class="mbtn" id="btnThemeImport">Импорт JSON</button>
+      <button class="mbtn" id="btnThemeReset">Сброс</button>
+    </div>
+    <div class="dr-label">Бэкенд WPF</div>
+    <div class="proto">Мост <b>WebView2</b>:
+C# → JS: <b>PostWebMessageAsString</b>
+ {"t":"output","level":"info","text":"…"}
+ {"t":"open","name":"s.lua","code":"…"}
+ {"t":"attached","pid":1234} / {"t":"detached"}
+ {"t":"files","files":[{"name","ts"}]}
+ {"t":"theme","name":"…","theme":{…}}
+ {"t":"toast","kind":"ok","text":"…"}
+
+JS → C#: hostObject <b>"spectre"</b>
+ Execute · Attach · Detach · ListScripts
+ ReadScript · SaveScript · DeleteScript
+ RenameScript · OpenFolder · Ping
+ Minimize · CloseApp · DragWindow
+
+Из C# доступен <b>window.SPECTRE</b>:
+ openTab(name, code) · log(level, text)
+ execute() · setTheme(vars, name)</div>
+    <div class="dr-btns"><button class="mbtn primary" id="btnPing">Проверить связь</button></div>
+  </div>
+</div>
+
+<div id="modal"><div class="m-box" id="modalBox"></div></div>
+<div id="ctx"></div>
 <div id="toasts"></div>
+<div id="dropHint"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6"/><path d="M9 15h6"/></svg><span>ОТПУСТИ — ОТКРОЮ СКРИПТ</span></div></div>
+<input type="file" id="filePick" accept=".lua,.luau,.txt" hidden multiple>
 
 <script>
-/* ================================================================
-   SPECTRE — UI Lua-экзекьютора. Весь бэкенд живёт в WPF-приложении.
-   Связь: WebView2 hostObject "spectre" (асинхронный) либо postMessage.
-   Вне WPF автоматически включается демо-режим (localStorage).
-   ================================================================ */
 'use strict';
-const $=s=>document.querySelector(s);
-const root=document.documentElement;
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escA=s=>esc(s).replace(/"/g,'&quot;');
 const now=()=>new Date().toTimeString().slice(0,8);
-const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-/* ================= ТЕМЫ ================= */
-const THEMES={
- plasma:{name:'Плазма',vars:{'--bg':'#0b0e15','--bg2':'#10141d','--bg3':'#161b27','--line':'#252d3f','--line2':'#1b2231','--text':'#dce4f4','--mut':'#7e8aa8','--acc':'#ff6a45','--acc2':'#3ad6c6','--ok':'#54d98c','--warn':'#f5b74e','--err':'#ff5d7e','--syn-k':'#7cb8ff','--syn-s':'#ffc66b','--syn-n':'#7ef0c0','--syn-c':'#5d6b8c','--syn-b':'#ff9e64'}},
- toxin:{name:'Токсин',vars:{'--bg':'#0a110c','--bg2':'#0e1710','--bg3':'#131f15','--line':'#22392a','--line2':'#15241a','--text':'#dcf2e2','--mut':'#7ea98d','--acc':'#a4f542','--acc2':'#3ee6b0','--ok':'#7ef07e','--warn':'#e8d44d','--err':'#ff6b6b','--syn-k':'#6fd3ff','--syn-s':'#ffe066','--syn-n':'#9dff8a','--syn-c':'#5c7a63','--syn-b':'#d4f76a'}},
- blood:{name:'Кровь',vars:{'--bg':'#130a0d','--bg2':'#190e12','--bg3':'#211318','--line':'#3f2330','--line2':'#2a1820','--text':'#f6e2e9','--mut':'#ab8493','--acc':'#ff4d5e','--acc2':'#ffb14d','--ok':'#6ee7a0','--warn':'#f5c04e','--err':'#ff2e55','--syn-k':'#ff8fa3','--syn-s':'#ffce8a','--syn-n':'#7dd8c6','--syn-c':'#7a5566','--syn-b':'#ff7847'}},
- frost:{name:'Мороз',vars:{'--bg':'#e8edf6','--bg2':'#f3f6fb','--bg3':'#ffffff','--line':'#c7d2e6','--line2':'#dae2f0','--text':'#1a2440','--mut':'#5f6f92','--acc':'#0e86d4','--acc2':'#e04f8a','--ok':'#1fa463','--warn':'#c07d10','--err':'#d43a5f','--syn-k':'#1f6fd6','--syn-s':'#b45f17','--syn-n':'#0c8577','--syn-c':'#8598bd','--syn-b':'#c2417f'}},
- amber:{name:'Янтарь',vars:{'--bg':'#151007','--bg2':'#1b1509','--bg3':'#241c0c','--line':'#3f3316','--line2':'#2b2310','--text':'#f4e6c4','--mut':'#a3905f','--acc':'#ffb347','--acc2':'#a8d94e','--ok':'#9bd46a','--warn':'#ffd166','--err':'#ff6b57','--syn-k':'#ffc978','--syn-s':'#ffe8a3','--syn-n':'#c6e78a','--syn-c':'#6e5f39','--syn-b':'#ff9d5c'}}
+const SKINS={
+plasma:{label:'Плазма',rad:10,vars:{'--bg':'#0a0d13','--bg2':'#0f131c','--bg3':'#151b28','--line':'#232c3f','--line2':'#1a2130','--text':'#d9e2f3','--mut':'#75819c','--acc':'#ff6a45','--acc2':'#35d0ba','--ok':'#4ade80','--warn':'#f0b34c','--err':'#ff5d7e','--syn-k':'#7cb8ff','--syn-s':'#ffc66b','--syn-n':'#67e8c9','--syn-c':'#55617e','--syn-b':'#ff9e64','--syn-f':'#b3a1ff'}},
+toxin:{label:'Токсин',rad:8,vars:{'--bg':'#070d09','--bg2':'#0b120d','--bg3':'#101a13','--line':'#1d2f23','--line2':'#152219','--text':'#d7f0e0','--mut':'#6f8f7c','--acc':'#46f2a4','--acc2':'#37d3e0','--ok':'#46f2a4','--warn':'#f2d24e','--err':'#f26d7e','--syn-k':'#6bf2b0','--syn-s':'#f2e16b','--syn-n':'#7ee0f2','--syn-c':'#4c6a58','--syn-b':'#a3f26b','--syn-f':'#5ef2d0'}},
+blood:{label:'Кровавая луна',rad:12,vars:{'--bg':'#120a0d','--bg2':'#170e12','--bg3':'#1f1318','--line':'#35202a','--line2':'#281a21','--text':'#f3dde4','--mut':'#96707e','--acc':'#ff4d6d','--acc2':'#ff9e4f','--ok':'#7ee08a','--warn':'#f2b34c','--err':'#ff4d6d','--syn-k':'#ff7b93','--syn-s':'#ffc66b','--syn-n':'#e88bff','--syn-c':'#6e4a58','--syn-b':'#ff9e64','--syn-f':'#ff8fa3'}},
+frost:{label:'Мороз',rad:10,vars:{'--bg':'#e9eef6','--bg2':'#f4f7fc','--bg3':'#ffffff','--line':'#c9d5e6','--line2':'#dbe4f0','--text':'#1a2740','--mut':'#5d7396','--acc':'#146fd7','--acc2':'#ff7847','--ok':'#1a9e62','--warn':'#c07d10','--err':'#d64560','--syn-k':'#1263c8','--syn-s':'#9a6a00','--syn-n':'#0c8f6e','--syn-c':'#8aa0bd','--syn-b':'#c05a1e','--syn-f':'#6a44d6'}},
+amber:{label:'Янтарь',rad:14,vars:{'--bg':'#120d07','--bg2':'#191209','--bg3':'#22190d','--line':'#372a15','--line2':'#2a2010','--text':'#f3e5c8','--mut':'#9b8560','--acc':'#ffab2e','--acc2':'#ff5e3a','--ok':'#8fd65e','--warn':'#ffab2e','--err':'#f26d5e','--syn-k':'#ffcf6b','--syn-s':'#cde36b','--syn-n':'#ff9e64','--syn-c':'#6e5a38','--syn-b':'#ffe08a','--syn-f':'#ffb84f'}}
 };
-const FIELD_LBL={'--bg':'Фон','--bg2':'Панели','--bg3':'Блоки','--line':'Границы','--line2':'Разделители','--text':'Текст','--mut':'Приглушённый','--acc':'Акцент','--acc2':'Акцент 2','--ok':'Успех','--warn':'Предупреждение','--err':'Ошибка','--syn-k':'Код: ключевые слова','--syn-s':'Код: строки','--syn-n':'Код: числа','--syn-c':'Код: комментарии','--syn-b':'Код: встроенные'};
-const THEME_ORDER=['plasma','toxin','blood','frost','amber'];
+const VAR_DEFS=[['--bg','Фон окна'],['--bg2','Панели'],['--bg3','Блоки'],['--line','Границы'],['--text','Текст'],['--mut','Тусклый текст'],['--acc','Акцент'],['--acc2','Акцент 2'],['--ok','Успех'],['--warn','Предупр.'],['--err','Ошибка'],['--syn-k','Код: ключевые'],['--syn-s','Код: строки'],['--syn-n','Код: числа'],['--syn-c','Код: комменты'],['--syn-b','Код: встроенные'],['--syn-f','Код: функции']];
 
-/* ================= СОСТОЯНИЕ ================= */
-const S={
-  tabs:[],active:-1,seq:1,
-  attached:false,attaching:false,proc:null,procs:[],attachAt:0,
-  files:[],filter:'',
-  theme:ls.get('sp.theme','plasma'),
-  custom:ls.get('sp.custom',null),
-  settings:Object.assign({fs:14,tab:2,wrap:false,glow:true,autoscroll:true},ls.get('sp.settings',{})),
-  ws:ls.get('sp.ws','C:\\Users\\<вы>\\Documents\\SPECTRE\\workspace'),
-  mode:'demo',lastMs:null,conN:0,conH:ls.get('sp.conH',196)
-};
-function saveState(){
-  ls.set('sp.settings',S.settings);
-  ls.set('sp.session',{tabs:S.tabs.map(t=>({name:t.name,code:t.code,path:t.path,dirty:t.dirty})),active:S.active,seq:S.seq});
-}
-let saveT=null;const saveSoon=()=>{clearTimeout(saveT);saveT=setTimeout(saveState,400)};
+let vars={},themeName='plasma',rad=10,fs=14,glow=true;
+let tabs=[],activeId=null,files=[],selFile=null;
+let connected=false,connecting=false,attachedAt=0,pid=0;
+let entries=[],conFilter='all';
+let mode='demo',wsPath='~\\SPECTRE\\workspace';
 
-/* ================= ДЕМО-БЭКЕНД (браузер) ================= */
-const SEED={
-'welcome.lua':'-- Добро пожаловать в SPECTRE\n-- Ctrl+Enter выполнить · Ctrl+S сохранить · Ctrl+T вкладка\n\nprint("Привет из SPECTRE!")\nprint("Этот скрипт работает в демо-режиме")\n\nlocal player = game:GetService("Players").LocalPlayer\nwarn("Демо: обращение к "..player.Name)\n',
-'examples/спидометр.lua':'-- Пример: скорость персонажа\nlocal lp = game:GetService("Players").LocalPlayer\nlocal hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")\nif hum then\n    hum.WalkSpeed = 60\n    print("WalkSpeed = 60")\nend\n',
-'examples/прыжок.lua':'-- Пример: сила прыжка\nlocal lp = game:GetService("Players").LocalPlayer\nlocal hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")\nif hum then\n    hum.JumpPower = 120\n    print("JumpPower = 120")\nend\n',
-'examples/цикл-монитор.lua':'-- Пример: фоновый мониторинг (демо перехватит while true)\nwhile true do\n    print("тик: "..os.clock())\n    task.wait(1)\nend\n'
-};
-const Mock={
-  fs:null,
-  init(){this.fs=ls.get('sp.fs',null);if(!this.fs){this.fs={...SEED};this.persist()}},
-  persist(){ls.set('sp.fs',this.fs)},
-  execute(code){return new Promise(res=>{setTimeout(()=>{
-    const str=m=>{let s=m[2]||'';return s.replace(/\\.\\./g,'…')};
-    for(const m of code.matchAll(/print\s*\(\s*(["'])((?:[^"'\\]|\\.)*)\1/g))Router({t:'output',level:'out',text:str(m)});
-    for(const m of code.matchAll(/warn\s*\(\s*(["'])((?:[^"'\\]|\\.)*)\1/g))Router({t:'output',level:'warn',text:str(m)});
-    const gs=code.match(/GetService\(\s*["'](\w+)["']/);
-    if(gs)Router({t:'output',level:'out',text:'[демо] сервис '+gs[1]+' получен'});
-    if(/loadstring/.test(code))Router({t:'output',level:'warn',text:'[демо] loadstring выполнен в песочнице'});
-    if(/while\s+true/.test(code))Router({t:'output',level:'warn',text:'[демо] бесконечный цикл перехвачен'});
-    const er=code.match(/error\s*\(\s*(["'])((?:[^"'\\]|\\.)*)\1/);
-    if(er)Router({t:'output',level:'err',text:er[2]+' (демо-стек: stdin:1)'});
-    res();
-  },260+Math.random()*420)})},
-  attach(pid,name){return new Promise(res=>setTimeout(()=>{
-    const p=this.procs().find(x=>x.pid===pid)||{pid:18432,name:'RobloxPlayerBeta.exe'};
-    Router({t:'attached',pid:p.pid,name:p.name});res(p);
-  },1300))},
-  kill(){return new Promise(res=>setTimeout(()=>{Router({t:'detached'});res()},400))},
-  procs(){return[{pid:18432,name:'RobloxPlayerBeta.exe'},{pid:9024,name:'RobloxStudioBeta.exe'},{pid:22160,name:'RobloxPlayerBeta.exe (x2)'},{pid:4120,name:'chrome.exe'}]},
-  list(){return new Promise(res=>setTimeout(()=>res(Object.keys(this.fs).sort()),120))},
-  read(p){return Promise.resolve(this.fs[p]??'')},
-  save(p,c){this.fs[p]=c;this.persist();return Promise.resolve()},
-  del(p){delete this.fs[p];this.persist();return Promise.resolve()},
-  rename(a,b){this.fs[b]=this.fs[a];delete this.fs[a];this.persist();return Promise.resolve()},
-  ping(){return Promise.resolve({v:'demo',ms:Math.round(2+Math.random()*9)})}
-};
+const FSK='spectre_fs_v2';
+function readFS(){try{return JSON.parse(localStorage.getItem(FSK))||[]}catch(e){return[]}}
+function writeFS(f){localStorage.setItem(FSK,JSON.stringify(f))}
 
-/* ================= МОСТ WPF ↔ JS =================
-   C#: webView.CoreWebView2.AddHostObjectToScript("spectre", new Bridge());
-   Методы Bridge (async Task<string>) : Execute, Attach, Kill, GetProcesses,
-   ListScripts, ReadScript, SaveScript, DeleteScript, RenameScript,
-   SetWorkspace, OpenFolder, Ping. WPF→JS: PostWebMessageAsString(JSON). */
-const Bridge=(()=>{
-  const wv=window.chrome&&window.chrome.webview;
-  const host=(wv&&wv.hostObjects&&wv.hostObjects.spectre)||null;
-  let mode=host?'wpf':(wv?'msg':'demo');
-  const post=o=>{try{wv.postMessage(JSON.stringify(o))}catch(e){}};
-  const call=async(fn,fallback)=>{if(host){try{return await host[fn[0]](...fn.slice(1))}catch(e){log('err','Ошибка бэкенда: '+e.message)}}return fallback&&fallback()};
-  return{
-    get mode(){return mode},set mode(m){mode=m},
-    ping:()=>call(['Ping'],()=>Mock.ping()),
-    execute:c=>call(['Execute',c],()=>Mock.execute(c)),
-    attach:(pid,name)=>call(['Attach',String(pid)],()=>Mock.attach(pid,name)),
-    kill:()=>call(['Kill'],()=>Mock.kill()),
-    procs:async()=>{const r=await call(['GetProcesses'],()=>JSON.stringify(Mock.procs()));try{return JSON.parse(r)}catch(e){return[]}},
-    list:async()=>{const r=await call(['ListScripts'],()=>JSON.stringify(Object.keys(Mock.fs)));try{return JSON.parse(r)}catch(e){return[]}},
-    read:p=>call(['ReadScript',p],()=>Mock.read(p)),
-    save:(p,c)=>call(['SaveScript',p,c],()=>Mock.save(p,c)),
-    del:p=>call(['DeleteScript',p],()=>Mock.del(p)),
-    rename:(a,b)=>call(['RenameScript',a,b],()=>Mock.rename(a,b)),
-    setws:p=>call(['SetWorkspace',p],()=>{S.ws=p;ls.set('sp.ws',p)}),
-    openfolder:()=>call(['OpenFolder'],()=>toast('Доступно в WPF-режиме','warn')),
-    minimize:()=>call(['Minimize'],()=>toast('Доступно в WPF-режиме','warn')),
-    close:()=>call(['CloseApp'],()=>toast('Доступно в WPF-режиме','warn')),
-    post
-  };
-})();
-/* WPF → JS: сообщения */
-function Router(m){
-  if(!m||typeof m!=='object')return;
-  switch(m.t){
-    case 'output':log(m.level||'out',m.text??'');break;
-    case 'open':openTab({name:m.name||'скрипт.lua',code:m.code??'',path:m.path||null});toast('Скрипт получен из WPF');break;
-    case 'attached':S.attached=true;S.attaching=false;S.attachAt=Date.now();S.proc={pid:m.pid,name:m.name};syncAttachUI();log('ok','Подключено: '+m.name+' (PID '+m.pid+')');break;
-    case 'detached':S.attached=false;S.proc=null;syncAttachUI();log('warn','Отключено от процесса');break;
-    case 'files':S.files=m.list||[];renderFiles();break;
-    case 'workspace':S.ws=m.path;$('#wstxt').textContent=S.ws;ls.set('sp.ws',S.ws);break;
-    case 'theme':if(m.vars){S.custom=Object.assign({},S.custom||{},m.vars);applyTheme('custom');toast('Тема получена из WPF')}break;
-    case 'toast':toast(m.text,m.level);break;
-  }
+function getHost(){try{return window.chrome&&window.chrome.webview&&window.chrome.webview.hostObjects&&window.chrome.webview.hostObjects.spectre||null}catch(e){return null}}
+function updMode(){mode=getHost()?'bridge':'demo';const el=$('sbMode');el.textContent=mode;el.className='chip '+(mode==='bridge'?'bridge':'demo');$('sbConn').textContent=mode==='bridge'?'мост WebView2 активен':'мост не найден · демо-режим'}
+function demoCall(m,a){
+a=a||{};const f=readFS();
+switch(m){
+case 'ListScripts':return{files:f.map(x=>({name:x.name,ts:x.ts}))};
+case 'ReadScript':{const x=f.find(v=>v.name===a.name);return{content:x?x.content:''}}
+case 'SaveScript':{const i=f.findIndex(v=>v.name===a.name);const it={name:a.name,content:a.content,ts:Date.now()};if(i>=0)f[i]=it;else f.push(it);writeFS(f);return{ok:true}}
+case 'DeleteScript':writeFS(f.filter(v=>v.name!==a.name));return{ok:true};
+case 'RenameScript':{const x=f.find(v=>v.name===a.from);if(x){x.name=a.to;x.ts=Date.now();writeFS(f)}return{ok:true}}
+case 'Ping':return{ok:true,ms:4+Math.random()*18};
+case 'OpenFolder':toast('info','Демо: workspace хранится в localStorage браузера');return{ok:true};
+case 'Minimize':case 'CloseApp':case 'DragWindow':toast('info','Работает только внутри оболочки WPF');return{ok:true};
 }
-if(window.chrome&&window.chrome.webview){try{window.chrome.webview.addEventListener('message',e=>{try{Router(typeof e.data==='string'?JSON.parse(e.data):e.data)}catch(err){}})}catch(e){}}
-/* Поверхность для WPF (ExecuteScript / AddScriptToExecuteOnDocumentCreated) */
-window.SPECTRE={version:'1.0.7',log,openTab,execute:execActive,setTheme:applyTheme,toast,Router};
+return null}
+async function callBridge(m,a){
+const h=getHost();
+if(h){updMode();try{if(typeof h[m]==='function'){const r=await h[m](JSON.stringify(a||{}));try{return r?JSON.parse(r):null}catch(e){return null}}}catch(e){}
+try{window.chrome.webview.postMessage(JSON.stringify({m,a}))}catch(e){}
+return null}
+updMode();return demoCall(m,a)}
 
-/* ================= КОНСОЛЬ / ТОСТЫ / МЕНЮ / МОДАЛКИ ================= */
-const clog=$('#clog');
-function log(level,text){
-  const tag={out:'OUT',sys:'SYS',ok:'OK',warn:'WRN',err:'ERR',cmd:'CMD'}[level]||'OUT';
-  const d=document.createElement('div');d.className='cl '+level;
-  d.innerHTML='<span class="ct">'+now()+'</span><span class="cb">'+tag+'</span><span class="cx">'+esc(text)+'</span>';
-  clog.appendChild(d);
-  while(clog.children.length>600)clog.firstChild.remove();
-  S.conN++;$('#ccount').textContent=S.conN+' строк';
-  if(S.settings.autoscroll)clog.scrollTop=clog.scrollHeight;
-}
-function toast(text,level){
-  const t=document.createElement('div');t.className='toast '+(level||'');
-  t.innerHTML=esc(text);$('#toasts').appendChild(t);
-  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},2800);
-}
-const menuEl=$('#menu');
-function menu(x,y,items){
-  menuEl.innerHTML=items.map((it,i)=>it==='-'?'<div class="msep"></div>':
-    '<div class="mi'+(it.dgr?' dgr':'')+'" data-i="'+i+'">'+(it.ic||'')+esc(it.label)+(it.kbd?'<span class="kbd">'+it.kbd+'</span>'):'')+'</div>').join('');
-  menuEl.style.display='block';
-  const r=menuEl.getBoundingClientRect();
-  menuEl.style.left=Math.min(x,innerWidth-r.width-8)+'px';
-  menuEl.style.top=Math.min(y,innerHeight-r.height-8)+'px';
-  menuEl.querySelectorAll('.mi').forEach(el=>el.onclick=()=>{hide();const it=items[+el.dataset.i];it.fn&&it.fn()});
-  function hide(){menuEl.style.display='none';removeEventListener('click',hide);removeEventListener('blur',hide)}
-  setTimeout(()=>{addEventListener('click',hide);addEventListener('blur',hide)},0);
-}
-const modalEl=$('#modal');
-function ask(o){ /* {title,html,ok,cancel,danger,value} → Promise<string|null> */
-  return new Promise(res=>{
-    modalEl.innerHTML='<div class="mbox '+(o.wide?'wide':'')+'"><div class="mhead"><h3>'+esc(o.title)+'</h3>'+
-      '<button class="ibtn" data-m="x"><svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div>'+
-      '<div class="mbody">'+o.html+'</div><div class="mfoot">'+
-      (o.cancel===false?'':'<button class="btn" data-m="c">'+esc(o.cancel||'Отмена')+'</button>')+
-      '<button class="btn '+(o.danger?'':'primary')+'" data-m="o" style="'+(o.danger?'background:var(--err);border-color:var(--err);color:#fff':'')+'">'+esc(o.ok||'OK')+'</button></div></div>';
-    modalEl.classList.add('on');
-    const inp=modalEl.querySelector('input');if(inp){inp.focus();inp.select&&inp.select()}
-    const done=v=>{modalEl.classList.remove('on');modalEl.innerHTML='';removeEventListener('keydown',key);res(v)};
-    const key=e=>{if(e.key==='Escape')done(null);if(e.key==='Enter'&&inp)done(inp.value)};
-    addEventListener('keydown',key);
-    modalEl.onclick=e=>{if(e.target===modalEl)done(null);
-      const m=e.target.closest('[data-m]');if(!m)return;
-      if(m.dataset.m==='o')done(inp?inp.value:true);else done(null)};
-  });
-}
+function seedFS(){if(readFS().length)return;writeFS([
+{name:'Welcome.lua',ts:Date.now()-172800000,content:'-- Добро пожаловать в SPECTRE\nprint("SPECTRE v2.4.1 на связи")\nlocal player = game.Players.LocalPlayer\nprint("Привет, " .. player.Name)\nwarn("Это предупреждение из Lua")\n'},
+{name:'SpeedBoost.lua',ts:Date.now()-86400000,content:'local plr = game.Players.LocalPlayer\nlocal char = plr.Character or plr.CharacterAdded:Wait()\nlocal hum = char:WaitForChild("Humanoid")\nhum.WalkSpeed = 60\nhum.JumpPower = 90\nprint("WalkSpeed = 60, JumpPower = 90")\n'},
+{name:'FlyGui.lua',ts:Date.now()-3600000,content:'local gui = Instance.new("ScreenGui")\ngui.Name = "SpectreFly"\ngui.Parent = game.Players.LocalPlayer.PlayerGui\nlocal btn = Instance.new("TextButton", gui)\nbtn.Text = "FLY"\nbtn.Size = UDim2.new(0, 90, 0, 36)\nbtn.Position = UDim2.new(0.5, -45, 0.9, 0)\nprint("Fly GUI создан")\n'}])}
 
-/* ================= РЕДАКТОР ================= */
-const ta=$('#code'),pre=$('#hlpre'),gut=$('#gut');
-const KW=/\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|in|and|or|not|true|false|nil)\b/;
+function toast(kind,text){
+const el=document.createElement('div');el.className='toast '+kind;
+el.innerHTML='<span class="tdot"></span>'+esc(text);
+$('toasts').appendChild(el);
+setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),320)},3300)}
+
+let modalCb=null;
+function openModal(html){$('modalBox').innerHTML=html;$('modal').classList.add('open')}
+function closeModal(){$('modal').classList.remove('open');modalCb=null}
+function confirmBox(title,msg,ok){
+openModal('<div class="m-title">'+esc(title)+'</div><div class="m-text">'+esc(msg)+'</div><div class="m-btns"><button class="mbtn" id="mNo">Отмена</button><button class="mbtn primary" id="mYes">Да</button></div>');
+$('mNo').onclick=closeModal;
+$('mYes').onclick=()=>{closeModal();ok()}}
+function promptBox(title,def,ok){
+openModal('<div class="m-title">'+esc(title)+'</div><input class="minput" id="mInp" value="'+escA(def)+'" spellcheck="false"><div class="m-btns"><button class="mbtn" id="mNo">Отмена</button><button class="mbtn primary" id="mYes">Готово</button></div>');
+const inp=$('mInp');inp.focus();inp.select();
+const go=()=>{const v=inp.value;closeModal();ok(v)};
+$('mNo').onclick=closeModal;$('mYes').onclick=go;
+inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')go();if(e.key==='Escape')closeModal()}}
+
+function openCtx(x,y,items){
+const el=$('ctx');
+el.innerHTML=items.map((it,i)=>it==='-'?'<div class="csep"></div>':'<div class="ci'+(it.danger?' danger':'')+'" data-i="'+i+'">'+(it.svg||'')+'<span>'+esc(it.label)+'</span></div>').join('');
+el.classList.add('open');
+const w=el.offsetWidth,h=el.offsetHeight;
+el.style.left=Math.min(x,innerWidth-w-8)+'px';
+el.style.top=Math.min(y,innerHeight-h-8)+'px';
+el.querySelectorAll('.ci').forEach(ci=>ci.onclick=()=>{closeCtx();items[+ci.dataset.i].fn()})}
+function closeCtx(){$('ctx').classList.remove('open')}
+
+function push(lv,text){
+entries.push({lv,text,time:now()});
+if(entries.length>400)entries.shift();
+renderCon(true)}
+function renderCon(){
+const body=$('conBody');
+const nearBottom=body.scrollHeight-body.scrollTop-body.clientHeight<70;
+const vis=entries.filter(e=>conFilter==='all'||(conFilter==='info'?(e.lv==='info'||e.lv==='sys'||e.lv==='cmd'):e.lv===conFilter));
+body.innerHTML=vis.map(e=>'<div class="ce '+e.lv+'"><span class="ct">'+e.time+'</span><span class="cm">'+esc(e.text)+'</span></div>').join('')||'<div class="ce sys"><span class="ct"></span><span class="cm">пусто</span></div>';
+if(nearBottom)body.scrollTop=body.scrollHeight}
+
 function hl(src){
-  let s=esc(src);
-  const re=/(--\[\[[\s\S]*?\]\])|(--[^\n]*)|(\[\[[\s\S]*?\]\])|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(0x[0-9a-fA-F]+|\d+\.?\d*(?:[eE][+-]?\d+)?)\b|\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|in|and|or|not|true|false|nil)\b|\b(game|workspace|script|task|wait|print|warn|error|pcall|pairs|ipairs|tostring|tonumber|type|next|select|unpack|math|string|table|os|coroutine|Instance|Enum|Vector2|Vector3|CFrame|Color3|UDim2|Ray|TweenInfo|getgenv|loadstring|require|settings|Players|RunService|UserInputService|ReplicatedStorage|LocalPlayer)\b/g;
-  s=s.replace(re,(m,bc,lc,bs,str,num,kw,bi)=>
-    bc?'<span class="tk-c">'+bc+'</span>':lc?'<span class="tk-c">'+lc+'</span>':bs?'<span class="tk-s">'+bs+'</span>':
-    str?'<span class="tk-s">'+str+'</span>':num?'<span class="tk-n">'+num+'</span>':kw?'<span class="tk-k">'+kw+'</span>':'<span class="tk-b">'+bi+'</span>');
-  return s+'\n';
-}
-function cur(){return S.tabs[S.active]}
-function refreshEditor(){
-  const t=cur();if(!t){ta.value='';pre.innerHTML='';gut.innerHTML='';return}
-  ta.value=t.code;paint();
-}
-function paint(){
-  const t=cur();const code=t?t.code:'';
-  pre.innerHTML=hl(code);
-  const n=code.split('\n').length;let g='';
-  for(let i=1;i<=n;i++)g+=i+'\n';
-  gut.textContent=g;
-  $('#stchars').textContent=code.length.toLocaleString('ru')+' симв.';
-  caretInfo();
-}
-function caretInfo(){
-  const p=ta.selectionStart||0;const before=ta.value.slice(0,p);
-  const ln=before.split('\n');
-  $('#stcaret').textContent='Стр '+ln.length+', Стлб '+(ln[ln.length-1].length+1);
-}
-ta.addEventListener('input',()=>{const t=cur();if(!t)return;t.code=ta.value;t.dirty=true;paint();renderTabs();saveSoon()});
-ta.addEventListener('scroll',()=>{pre.scrollTop=ta.scrollTop;pre.scrollLeft=ta.scrollLeft;gut.style.transform='translateY(-'+ta.scrollTop+'px)'});
-['keyup','click','input'].forEach(ev=>ta.addEventListener(ev,caretInfo));
-ta.addEventListener('keydown',e=>{
-  const t=cur();if(!t)return;
-  if(e.key==='Tab'){e.preventDefault();
-    const s=ta.selectionStart,en=ta.selectionEnd,sp=' '.repeat(S.settings.tab);
-    ta.setRangeText(sp,s,en,'end');ta.dispatchEvent(new Event('input'));}
-  else if(e.key==='Enter'&&!e.ctrlKey){
-    const s=ta.selectionStart;const line=ta.value.slice(0,s).split('\n').pop();
-    const ind=(line.match(/^\s*/)||[''])[0];
-    const extra=/\b(then|do|function|else|repeat)\s*$|[\{\(]\s*$/.test(line)?' '.repeat(S.settings.tab):'';
-    if(extra){e.preventDefault();ta.setRangeText('\n'+ind+extra,s,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
-    else if(ind){e.preventDefault();ta.setRangeText('\n'+ind,s,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
-  }
-});
-addEventListener('keydown',e=>{
-  const mod=e.ctrlKey||e.metaKey;
-  if(mod&&e.key==='Enter'){e.preventDefault();execActive()}
-  else if(e.key==='F5'){e.preventDefault();execActive()}
-  else if(mod&&(e.key==='s'||e.key==='ы')){e.preventDefault();saveActive()}
-  else if(mod&&(e.key==='t'||e.key==='е')){e.preventDefault();openTab()}
-  else if(mod&&(e.key==='w'||e.key==='ц')){e.preventDefault();closeTab(S.active)}
-});
+const re=/(-{2,}\[\[[\s\S]*?(\]\]|$))|(--[^\n]*)|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|\[\[[\s\S]*?(\]\]|$))|(\b0x[\da-fA-F]+\b|\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(local|function|end|if|then|elseif|else|for|while|repeat|until|return|break|do|and|or|not|in|true|false|nil|continue|self)\b|\b(print|warn|error|game|workspace|script|task|wait|spawn|delay|Instance|Enum|Vector2|Vector3|CFrame|Color3|UDim2|UDim|math|string|table|coroutine|os|tostring|tonumber|pairs|ipairs|next|select|type|typeof|pcall|xpcall|unpack|setmetatable|getmetatable|rawget|rawset|require|loadstring|getgenv|getsenv|hookfunction|getrawmetatable|setreadonly|request|identifyexecutor|syn|Krnl)\b|([A-Za-z_]\w*)(?=\s*[({])|([+\-*/%^#=~<>&|.:,;!?]+|\.\.)/g;
+let out='',last=0,m;
+while((m=re.exec(src))){
+out+=esc(src.slice(last,m.index));
+const cls=m[1]||m[3]?'c':m[4]?'s':m[7]?'n':m[8]?'k':m[9]?'b':m[10]?'f':'o';
+out+='<span class="tk-'+cls+'">'+esc(m[0])+'</span>';
+last=re.lastIndex}
+return out+esc(src.slice(last))+'\n'}
 
-/* ================= ВКЛАДКИ ================= */
-const tabsbar=$('#tabsbar');
-function openTab(o){
-  o=Object.assign({name:'untitled-'+(S.seq++)+'.lua',code:'',path:null,dirty:false},o);
-  const ex=o.path?S.tabs.findIndex(t=>t.path===o.path):-1;
-  if(ex>=0){S.active=ex;renderTabs();refreshEditor();return S.tabs[ex]}
-  S.tabs.push(o);S.active=S.tabs.length-1;
-  renderTabs();refreshEditor();saveSoon();ta.focus();
-  return o;
-}
-function closeTab(i){
-  if(i<0||i>=S.tabs.length)return;
-  const t=S.tabs[i];
-  const fin=()=>{S.tabs.splice(i,1);
-    if(S.active>=S.tabs.length)S.active=S.tabs.length-1;
-    else if(S.active>i)S.active--;
-    if(!S.tabs.length)openTab();else{renderTabs();refreshEditor()}saveSoon()};
-  if(t.dirty){ask({title:'Закрыть вкладку',html:'<p style="font-size:12px;line-height:1.7">«'+esc(t.name)+'» не сохранён.<br>Закрыть без сохранения?</p>',ok:'Закрыть',cancel:'Отмена',danger:true}).then(v=>{if(v)fin()})}
-  else fin();
-}
+const editor=$('editor'),hlCode=$('hlCode'),gutter=$('gutter'),tabsEl=$('tabs');
+function cur(){return tabs.find(t=>t.id===activeId)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+function renderEditor(){
+const t=cur();if(!t)return;
+hlCode.innerHTML=hl(t.content);
+const lines=t.content.split('\n').length;
+const digits=Math.max(2,String(lines).length);
+gutter.style.width=(digits+1.1)+'ch';
+const pad='calc('+(digits+1.1)+'ch + 12px)';
+gutter.textContent=Array.from({length:lines},(_,i)=>i+1).join('\n');
+hlCode.style.paddingLeft=pad;editor.style.paddingLeft=pad;
+syncScroll()}
+function syncScroll(){hlCode.scrollTop=editor.scrollTop;hlCode.scrollLeft=editor.scrollLeft;gutter.scrollTop=editor.scrollTop}
+function markDirty(){const el=tabsEl.querySelector('.tab[data-id="'+activeId+'"]');if(el){const t=cur();el.classList.toggle('dirty',t.content!==t.saved)}}
+function updSbFile(){const t=cur();$('sbFile').textContent=t?(t.name+(t.content!==t.saved?' •':'')):''}
+function updCaret(){const v=editor.value.slice(0,editor.selectionStart);const ln=(v.match(/\n/g)||[]).length+1;const col=v.length-v.lastIndexOf('\n');$('sbCaret').textContent='Ln '+ln+', Col '+col}
+
 function renderTabs(){
-  tabsbar.innerHTML=S.tabs.map((t,i)=>
-    '<div class="tab'+(i===S.active?' on':'')+'" draggable="true" data-i="'+i+'" title="'+esc(t.name)+'">'+
-    '<span class="dot"></span><span class="tn">'+esc(t.name)+'</span>'+
-    (t.dirty?'<span class="mod">●</span>':'')+
-    '<span class="tx" data-x="'+i+'">×</span></div>').join('')+
-    '<button class="newtab" data-act="newtab" title="Новая вкладка (Ctrl+T)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>';
-}
-let dragI=-1;
-tabsbar.addEventListener('dragstart',e=>{const t=e.target.closest('.tab');if(!t)return;dragI=+t.dataset.i;e.dataTransfer.effectAllowed='move'});
-tabsbar.addEventListener('dragover',e=>{e.preventDefault();
-  const t=e.target.closest('.tab');if(!t||dragI<0)return;
-  const j=+t.dataset.i;if(j===dragI)return;
-  const [m]=S.tabs.splice(dragI,1);S.tabs.splice(j,0,m);dragI=j;
-  S.active=j;renderTabs();$('#tabsbar').children[j]&&0;});
-tabsbar.addEventListener('drop',e=>{e.preventDefault();dragI=-1;renderTabs();saveSoon()});
-tabsbar.addEventListener('click',e=>{
-  const x=e.target.closest('.tx');
-  if(x){closeTab(+x.dataset.x);return}
-  const act=e.target.closest('[data-act]');
-  if(act){doAct(act.dataset.act);return}
-  const t=e.target.closest('.tab');
-  if(t){S.active=+t.dataset.i;renderTabs();refreshEditor();ta.focus()}
-});
-tabsbar.addEventListener('dblclick',e=>{const t=e.target.closest('.tab');if(t&&!e.target.closest('.tx'))renameTab(+t.dataset.i)});
-tabsbar.addEventListener('contextmenu',e=>{
-  const t=e.target.closest('.tab');if(!t)return;e.preventDefault();
-  const i=+t.dataset.i;
-  menu(e.clientX,e.clientY,[
-    {label:'Переименовать',fn:()=>renameTab(i)},
-    {label:'Дублировать',fn:()=>{const s=S.tabs[i];openTab({name:'копия '+s.name,code:s.code,path:null,dirty:true})}},
-    {label:'Сохранить как…',fn:()=>{S.active=i;renderTabs();refreshEditor();saveActive(true)}},
-    '-',
-    {label:'Закрыть',fn:()=>closeTab(i)},
-    {label:'Закрыть остальные',dgr:true,fn:()=>{S.tabs=[S.tabs[i]];S.active=0;renderTabs();refreshEditor();saveSoon()}}
-  ]);
-});
-function renameTab(i){
-  const t=S.tabs[i];if(!t)return;
-  ask({title:'Переименовать вкладку',html:'<div class="field"><label>Имя файла</label><input type="text" value="'+esc(t.name)+'"></div>',ok:'Готово'}).then(v=>{
-    if(v&&v.trim()){t.name=v.trim();t.dirty=true;renderTabs();saveSoon()}
-  });
-}
+tabsEl.innerHTML='';
+tabs.forEach(t=>{
+const el=document.createElement('div');
+el.className='tab'+(t.id===activeId?' active':'')+(t.content!==t.saved?' dirty':'');
+el.dataset.id=t.id;el.draggable=true;el.title=t.name;
+el.innerHTML='<span class="tname">'+esc(t.name)+'</span><button class="tx" title="Закрыть (Ctrl+W)">×</button>';
+el.addEventListener('dragstart',e=>{dragTabId=t.id;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',t.id)}catch(_){}});
+el.addEventListener('dragend',()=>{dragTabId=null;tabsEl.querySelectorAll('.dl,.dr').forEach(c=>c.classList.remove('dl','dr'))});
+tabsEl.appendChild(el)});
+updSbFile()}
 
-/* ================= ФАЙЛЫ ================= */
+let dragTabId=null;
+tabsEl.addEventListener('click',e=>{
+const x=e.target.closest('.tx');const el=e.target.closest('.tab');if(!el)return;
+const id=el.dataset.id;
+if(x){closeTab(id);return}
+activateTab(id)});
+tabsEl.addEventListener('dblclick',e=>{const el=e.target.closest('.tab');if(el&&!e.target.closest('.tx'))inlineRename(el.dataset.id,el)});
+tabsEl.addEventListener('contextmenu',e=>{
+const el=e.target.closest('.tab');if(!el)return;e.preventDefault();
+const id=el.dataset.id;activateTab(id);
+openCtx(e.clientX,e.clientY,[
+{label:'Переименовать',svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',fn:()=>inlineRename(id,tabsEl.querySelector('.tab[data-id="'+id+'"]'))},
+{label:'Дублировать',svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',fn:()=>duplicateTab(id)},
+'-',
+{label:'Закрыть',fn:()=>closeTab(id)},
+{label:'Закрыть остальные',fn:()=>closeOthers(id)},
+{label:'Закрыть все',danger:true,fn:closeAll}])});
+tabsEl.addEventListener('dragover',e=>{
+if(!dragTabId)return;e.preventDefault();
+const el=e.target.closest('.tab');
+tabsEl.querySelectorAll('.dl,.dr').forEach(c=>c.classList.remove('dl','dr'));
+if(el&&el.dataset.id!==dragTabId){const r=el.getBoundingClientRect();el.classList.add(e.clientX<r.left+r.width/2?'dl':'dr')}});
+tabsEl.addEventListener('drop',e=>{
+if(!dragTabId)return;e.preventDefault();
+const el=e.target.closest('.tab');
+tabsEl.querySelectorAll('.dl,.dr').forEach(c=>c.classList.remove('dl','dr'));
+if(!el||el.dataset.id===dragTabId)return;
+const before=el.classList.contains('dl');
+const from=tabs.findIndex(t=>t.id===dragTabId);
+const[m]=tabs.splice(from,1);
+let i=tabs.findIndex(t=>t.id===el.dataset.id);
+if(!before)i++;
+tabs.splice(i,0,m);renderTabs()});
+
+function newTab(name,content,opts){
+opts=opts||{};
+const t={id:uid(),name:name||('Без названия '+(tabs.length+1)+'.lua'),content:content||'',saved:opts.saved!==undefined?opts.saved:'',path:opts.path||null};
+if(opts.saved===undefined)t.saved=t.content;
+tabs.push(t);activateTab(t.id);return t}
+function activateTab(id){
+activeId=id;const t=cur();if(!t)return;
+editor.value=t.content;
+renderTabs();renderEditor();updCaret();editor.focus()}
+function closeTab(id){
+const i=tabs.findIndex(t=>t.id===id);if(i<0)return;
+const t=tabs[i];
+const doIt=()=>{
+tabs.splice(i,1);
+if(activeId===id){
+if(tabs.length){activateTab(tabs[Math.min(i,tabs.length-1)].id)}
+else{newTab()}}
+else renderTabs()};
+if(t.content!==t.saved)confirmBox('Закрыть вкладку','«'+t.name+'» содержит несохранённые изменения. Закрыть без сохранения?',doIt);
+else doIt()}
+function closeOthers(id){
+const keep=tabs.filter(t=>t.id===id);
+tabs=keep.length?keep:[tabs[0]];
+activateTab(id);toast('info','Остальные вкладки закрыты')}
+function closeAll(){tabs=[];newTab();toast('info','Все вкладки закрыты')}
+function duplicateTab(id){
+const t=tabs.find(v=>v.id===id);if(!t)return;
+newTab(t.name.replace(/(\.\w+)?$/,' (копия)$1'),t.content,{saved:''});
+toast('ok','Вкладка продублирована')}
+function inlineRename(id,el){
+const t=tabs.find(v=>v.id===id);if(!t||!el)return;
+const nameEl=el.querySelector('.tname');
+const inp=document.createElement('input');
+inp.className='tedit';inp.value=t.name;
+nameEl.replaceWith(inp);inp.focus();inp.select();
+let done=false;
+const commit=ok=>{if(done)return;done=true;
+if(ok&&inp.value.trim()){t.name=inp.value.trim()}
+renderTabs();renderFiles()};
+inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')commit(true);if(e.key==='Escape')commit(false)};
+inp.onblur=()=>commit(true)}
+
+function onEdit(){
+const t=cur();if(!t)return;
+t.content=editor.value;
+renderEditor();markDirty();updSbFile();updCaret()}
+
+editor.addEventListener('input',onEdit);
+editor.addEventListener('scroll',syncScroll);
+['keyup','click','select'].forEach(ev=>editor.addEventListener(ev,updCaret));
+editor.addEventListener('keydown',e=>{
+if(e.key==='Tab'){e.preventDefault();
+editor.setRangeText('  ',editor.selectionStart,editor.selectionEnd,'end');onEdit();return}
+if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();
+const s=editor.selectionStart;const before=editor.value.slice(0,s);
+const line=before.slice(before.lastIndexOf('\n')+1);
+const ind=(line.match(/^\s*/)||[''])[0];
+const extra=/(\bthen|\belse|\bdo|\bfunction|[\(\{\[])\s*$/.test(line)?'  ':'';
+editor.setRangeText('\n'+ind+extra,s,editor.selectionEnd,'end');onEdit()}});
+
+function execute(){
+const t=cur();if(!t)return;
+if(!t.content.trim()){toast('warn','Вкладка пуста — нечего выполнять');return}
+if(!connected){toast('warn','Сначала подключись к процессу Roblox');
+const b=$('btnAttach');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');return}
+push('cmd','выполнение: '+t.name);
+if(getHost())callBridge('Execute',{name:t.name,code:t.content});
+else demoRun(t.content,t.name)}
+function demoRun(code,name){
+push('sys','[демо] запуск '+name+' …');
+let i=0,found=false;
+const re=/\b(print|warn|error)\s*\(([^)\n]*)\)/g;let m;
+while((m=re.exec(code))){found=true;i++;
+const txt=m[2].replace(/["']/g,'').replace(/\.\./g,' ').replace(/\s+/g,' ').trim()||'…';
+const lv=m[1]==='print'?'info':m[1]==='warn'?'warn':'error';
+setTimeout(()=>push(lv,txt),90*i)}
+if(/\bgame\b|\bworkspace\b|\bInstance\b/.test(code)){i++;setTimeout(()=>push('info','[мост] перехвачена ссылка на Instance'),90*i)}
+setTimeout(()=>push('sys','[демо] завершено · '+(found?(0.02+Math.random()*0.09).toFixed(2)+' с':'без вывода')),90*(i+1)+60)}
+
+function setConnected(v,p){
+connected=v;
+if(v){pid=p||4000+Math.floor(Math.random()*9000);attachedAt=Date.now();
+$('connPill').className='tstat on';$('connText').textContent='Roblox · PID '+pid;
+$('sbConn').textContent='подключено · PID '+pid;
+$('btnAttach').classList.add('on');$('attachLabel').textContent='Отключить'}
+else{attachedAt=0;$('sbTimer').textContent='';
+$('connPill').className='tstat off';$('connText').textContent='не подключено';
+$('sbConn').textContent=getHost()?'мост WebView2 активен':'мост не найден · демо-режим';
+$('btnAttach').classList.remove('on');$('attachLabel').textContent='Подключить'}}
+
+function attachToggle(){
+if(connecting)return;
+if(connected){
+if(getHost())callBridge('Detach');
+setConnected(false);toast('info','Отключено от процесса');return}
+connecting=true;
+const btn=$('btnAttach'),prog=$('attachProg');
+btn.classList.add('busy');$('attachLabel').textContent='Подключение…';
+if(getHost())callBridge('Attach');
+let p=0;
+const iv=setInterval(()=>{
+p=Math.min(100,p+2.4+Math.random()*2.2);
+prog.style.width=p+'%';
+if(p>=100){clearInterval(iv);
+setTimeout(()=>{prog.style.width='0';btn.classList.remove('busy');connecting=false;
+setConnected(true);toast('ok','Подключено к Roblox · PID '+pid);push('sys','инжек подключён, выполнение разрешено')},160)}},26)}
+
 async function refreshFiles(){
-  S.files=(await Bridge.list())||[];renderFiles();
-}
+const r=await callBridge('ListScripts');
+if(r&&r.files){files=r.files;renderFiles()}}
+function fmtTs(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return p(d.getDate())+'.'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())}
 function renderFiles(){
-  const q=S.filter.toLowerCase();
-  const list=S.files.filter(f=>!q||f.toLowerCase().includes(q));
-  $('#fcount').textContent=S.files.length;
-  const act=cur();
-  $('#flist').innerHTML=list.length?list.map(f=>{
-    const base=f.split('/').pop();
-    return '<div class="file'+(act&&act.path===f?' on':'')+'" data-f="'+esc(f)+'" title="'+esc(f)+'">'+
-      '<svg class="fico" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>'+
-      '<span class="fname">'+esc(base)+'</span>'+
-      '<span class="fsize">'+(f.length>30?'':esc(f.split('/').slice(0,-1).join('/')))+'</span>'+
-      '<span class="facts">'+
-      '<button class="ibtn" data-fr="'+esc(f)+'" title="Переименовать"><svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7 21l-4 1 1-4z"/></svg></button>'+
-      '<button class="ibtn" data-fd="'+esc(f)+'" title="Удалить"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>'+
-      '</span></div>'}).join('')
-    :'<div class="fempty">Здесь пусто.<br>Перетащите <b>.lua</b>-файлы прямо в окно<br>или создайте новый скрипт.</div>';
-  const kb=Math.round(S.files.reduce((a,f)=>a+f.length,0)/102.4)/10;
-  $('#fstats').textContent=S.files.length+' файл(ов) · ~'+kb+' КБ имён';
-}
-$('#flist').addEventListener('click',async e=>{
-  const rn=e.target.closest('[data-fr]');
-  if(rn){renFile(rn.dataset.fr);return}
-  const dl=e.target.closest('[data-fd]');
-  if(dl){delFile(dl.dataset.fd);return}
-  const f=e.target.closest('.file');
-  if(f)await openFile(f.dataset.f);
-});
-$('#flist').addEventListener('contextmenu',e=>{
-  const f=e.target.closest('.file');if(!f)return;e.preventDefault();
-  const p=f.dataset.f;
-  menu(e.clientX,e.clientY,[
-    {label:'Открыть',fn:()=>openFile(p)},
-    {label:'Переименовать',fn:()=>renFile(p)},
-    {label:'Удалить',dgr:true,fn:()=>delFile(p)}
-  ]);
-});
-async function openFile(p){
-  const ex=S.tabs.findIndex(t=>t.path===p);
-  if(ex>=0){S.active=ex;renderTabs();refreshEditor();ta.focus();return}
-  const code=await Bridge.read(p);
-  openTab({name:p.split('/').pop(),code:code??'',path:p,dirty:false});
-  log('sys','Открыт: '+p);
-}
-async function saveActive(force){
-  const t=cur();if(!t)return;
-  if(!t.path||force){
-    const def=t.name.endsWith('.lua')?t.name:t.name+'.lua';
-    const v=await ask({title:'Сохранить в workspace',html:
-      '<div class="field"><label>Папка</label><input type="text" value="'+esc(S.ws)+'" readonly style="opacity:.6"></div>'+
-      '<div class="field"><label>Имя файла (можно с папкой: папка/имя.lua)</label><input type="text" value="'+esc(def)+'"></div>',ok:'Сохранить'});
-    if(!v||!v.trim())return;
-    t.path=v.trim().replace(/\\/g,'/');t.name=t.path.split('/').pop();
-  }
-  await Bridge.save(t.path,t.code);
-  t.dirty=false;renderTabs();refreshFiles();
-  toast('Сохранено: '+t.name,'ok');log('ok','Файл записан: '+t.path);saveSoon();
-}
-async function delFile(p){
-  const v=await ask({title:'Удалить файл',html:'<p style="font-size:12px;line-height:1.7">Удалить <b style="color:var(--err)">'+esc(p)+'</b> из workspace?<br>Действие необратимо.</p>',ok:'Удалить',danger:true});
-  if(!v)return;
-  await Bridge.del(p);refreshFiles();toast('Удалено: '+p,'warn');log('warn','Удалён файл: '+p);
-}
-async function renFile(p){
-  const v=await ask({title:'Переименовать файл',html:'<div class="field"><label>Новое имя</label><input type="text" value="'+esc(p)+'"></div>',ok:'Переименовать'});
-  if(!v||!v.trim()||v.trim()===p)return;
-  const np=v.trim().replace(/\\/g,'/');
-  await Bridge.rename(p,np);
-  const t=S.tabs.find(t=>t.path===p);if(t){t.path=np;t.name=np.split('/').pop()}
-  refreshFiles();renderTabs();toast('Переименовано','ok');
-}
-async function newFile(){
-  const v=await ask({title:'Новый скрипт',html:'<div class="field"><label>Имя файла</label><input type="text" value="script.lua"></div>',ok:'Создать'});
-  if(!v||!v.trim())return;
-  const p=v.trim().replace(/\\/g,'/');
-  const tpl='-- '+p.split('/').pop()+'\n\nprint("скрипт запущен")\n';
-  await Bridge.save(p,tpl);await refreshFiles();
-  openTab({name:p.split('/').pop(),code:tpl,path:p,dirty:false});
-  toast('Создан: '+p,'ok');
-}
-$('#fsearch').addEventListener('input',e=>{S.filter=e.target.value;renderFiles()});
+const q=($('fileSearch').value||'').toLowerCase();
+const list=files.filter(f=>f.name.toLowerCase().includes(q)).sort((a,b)=>b.ts-a.ts);
+$('fileList').innerHTML=list.length?list.map(f=>
+'<div class="frow'+(selFile===f.name?' sel':'')+'" data-name="'+escA(f.name)+'" title="'+escA(f.name)+'">'+
+'<svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'+
+'<span class="fname">'+esc(f.name)+'</span><span class="fts">'+fmtTs(f.ts)+'</span>'+
+'<span class="facts">'+
+'<button class="fact fo" title="Открыть во вкладке"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></button>'+
+'<button class="fact fr" title="Переименовать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>'+
+'<button class="fact fd danger" title="Удалить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'+
+'</span></div>').join('')
+:'<div class="fempty">Скрипты не найдены.<br>Создай новый или перетащи .lua файл в окно.</div>';
+const n=files.length;
+$('fileCount').textContent=n+' файл'+(n%10===1&&n%100!==11?'':(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'а':'ов'));
+$('wsPath').textContent=wsPath;$('wsPathTop').textContent=wsPath}
 
-/* ================= ВЫПОЛНЕНИЕ / ПОДКЛЮЧЕНИЕ ================= */
-async function execActive(){
-  const t=cur();if(!t)return;
-  if(!S.attached){toast('Сначала подключите процесс','warn');
-    const b=$('#attachbtn');b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),850);return}
-  const btn=$('#execbtn');btn.classList.add('busy');
-  log('cmd','» '+t.name+' ('+t.code.length+' симв.)');
-  const t0=performance.now();
-  try{await Bridge.execute(t.code);
-    S.lastMs=Math.round(performance.now()-t0);
-    log('ok','Выполнено за '+S.lastMs+' мс');
-    $('#stexec').innerHTML='выполнено за <b>'+S.lastMs+' мс</b>';
-  }catch(e){log('err','Сбой выполнения: '+e)}
-  btn.classList.remove('busy');
-}
-function syncAttachUI(){
-  const b=$('#attachbtn');
-  b.classList.toggle('attached',S.attached);
-  $('#attachtxt').textContent=S.attached?'Подключено':'Подключить';
-  const st=$('#stattach');
-  st.classList.toggle('on',S.attached);
-  $('#stattachtxt').textContent=S.attached?'подключено':'не подключено';
-  $('#stproc').textContent='процесс: '+(S.proc?S.proc.name+' ('+S.proc.pid+')':'—');
-}
-async function doAttach(){
-  if(S.attached){toast('Уже подключено','warn');return}
-  if(S.attaching)return;
-  S.attaching=true;
-  const b=$('#attachbtn');b.classList.add('busy');
-  log('sys','Поиск процесса'+(S.proc?' '+S.proc.name:' RobloxPlayerBeta.exe')+'…');
-  try{
-    if(Bridge.mode==='wpf')await Bridge.attach(S.proc?S.proc.pid:0,S.proc?S.proc.name:'');
-    else await Mock.attach(S.proc&&S.proc.pid,S.proc&&S.proc.name);
-  }catch(e){log('err','Не удалось подключиться: '+e)}
-  S.attaching=false;b.classList.remove('busy');
-}
-async function doKill(){
-  if(!S.attached){toast('Нет активного подключения','warn');return}
-  await Bridge.kill();
-}
-async function loadProcs(){
-  S.procs=(await Bridge.procs())||[];
-  return S.procs;
-}
+async function openFile(name){
+const ex=tabs.find(t=>t.path===name);
+if(ex){activateTab(ex.id);return}
+selFile=name;renderFiles();
+const r=await callBridge('ReadScript',{name});
+const content=r?r.content:'';
+newTab(name,content,{path:name,saved:content});
+toast('info','Открыт: '+name)}
+function renameFile(name){
+promptBox('Переименовать скрипт',name,async v=>{
+v=(v||'').trim();if(!v||v===name)return;
+if(!v.includes('.'))v+='.lua';
+await callBridge('RenameScript',{from:name,to:v});
+tabs.forEach(t=>{if(t.path===name){t.path=v;t.name=v}});
+renderTabs();await refreshFiles();toast('ok','Переименовано в '+v)})}
+function deleteFile(name){
+confirmBox('Удалить скрипт','Файл «'+name+'» будет удалён из workspace безвозвратно.',async()=>{
+await callBridge('DeleteScript',{name});
+if(selFile===name)selFile=null;
+await refreshFiles();toast('ok','Удалён: '+name)})}
 
-/* ================= ТЕМЫ: ПРИМЕНЕНИЕ / НАСТРОЙКА ================= */
-function applyTheme(id){
-  let vars;
-  if(id==='custom'){vars=S.custom;if(!vars){id='plasma';vars=THEMES.plasma.vars}}
-  else vars=(THEMES[id]||THEMES.plasma).vars;
-  for(const k in vars)root.style.setProperty(k,vars[k]);
-  root.style.setProperty('--fs',S.settings.fs+'px');
-  document.body.classList.toggle('noglow',!S.settings.glow);
-  S.theme=id;ls.set('sp.theme',id);if(id==='custom')ls.set('sp.custom',S.custom);
-  $('#sttheme').textContent=id==='custom'?'Своя':(THEMES[id]?THEMES[id].name:id);
-}
-function cycleTheme(){
-  const i=THEME_ORDER.indexOf(S.theme);
-  const next=THEME_ORDER[(i+1)%THEME_ORDER.length];
-  applyTheme(next);toast('Тема: '+(THEMES[next]?THEMES[next].name:next));
-}
+const fileList=$('fileList');
+fileList.addEventListener('click',e=>{
+const row=e.target.closest('.frow');if(!row)return;
+const name=row.dataset.name;
+selFile=name;renderFiles();
+if(e.target.closest('.fo'))openFile(name);
+else if(e.target.closest('.fr'))renameFile(name);
+else if(e.target.closest('.fd'))deleteFile(name)});
+fileList.addEventListener('dblclick',e=>{const row=e.target.closest('.frow');if(row&&!e.target.closest('.fact'))openFile(row.dataset.name)});
+fileList.addEventListener('contextmenu',e=>{
+const row=e.target.closest('.frow');if(!row)return;e.preventDefault();
+const name=row.dataset.name;selFile=name;renderFiles();
+openCtx(e.clientX,e.clientY,[
+{label:'Открыть во вкладке',svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>',fn:()=>openFile(name)},
+{label:'Переименовать',svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',fn:()=>renameFile(name)},
+'-',
+{label:'Удалить',danger:true,svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',fn:()=>deleteFile(name)}])});
 
-/* ================= НАСТРОЙКИ (модалка) ================= */
-function openSettings(){
-  const sw=THEME_ORDER.map(id=>{const t=THEMES[id];
-    return '<div class="sw'+(S.theme===id?' on':'')+'" data-sw="'+id+'"><span class="dots"><i style="background:'+t.vars['--bg3']+'"></i><i style="background:'+t.vars['--acc']+'"></i><i style="background:'+t.vars['--acc2']+'"></i></span>'+t.name+'</div>'}).join('');
-  const cf=Object.keys(FIELD_LBL).map(k=>{
-    const v=(S.custom&&S.custom[k])||getComputedStyle(root).getPropertyValue(k).trim();
-    return '<div class="cfield"><input type="color" data-cv="'+k+'" value="'+toHex(v)+'"><span>'+FIELD_LBL[k]+'</span></div>'}).join('');
-  ask({title:'НАСТРОЙКИ',wide:true,ok:'Готово',cancel:false,html:
-    '<div class="setsec">Тема оформления</div>'+
-    '<div class="swatches">'+sw+'<div class="sw'+(S.theme==='custom'?' on':'')+'" data-sw="custom"><span class="dots"><i style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"></i></span>Своя тема</div></div>'+
-    '<div class="setsec">Свои цвета</div><div class="cgrid">'+cf+'</div>'+
-    '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn" data-x1="resetc">Сбросить свою тему</button></div>'+
-    '<div class="setsec">Редактор</div>'+
-    '<div class="rangerow"><span>Размер шрифта кода</span><input type="range" min="11" max="20" value="'+S.settings.fs+'" data-r="fs"><b data-rv="fs">'+S.settings.fs+'px</b></div>'+
-    '<div class="rangerow"><span>Табуляция (пробелов)</span><input type="range" min="2" max="8" step="2" value="'+S.settings.tab+'" data-r="tab"><b data-rv="tab">'+S.settings.tab+'</b></div>'+
-    '<div class="rangerow"><span>Перенос строк</span><input type="checkbox" data-ch="wrap" '+(S.settings.wrap?'checked':'')+'></div>'+
-    '<div class="rangerow"><span>Свечение акцентов</span><input type="checkbox" data-ch="glow" '+(S.settings.glow?'checked':'')+'></div>'+
-    '<div class="setsec">Бэкенд WPF</div>'+
-    '<div class="rangerow"><span>Режим моста</span><b style="min-width:auto">'+({wpf:'WPF hostObject',msg:'WPF postMessage',demo:'Демо (браузер)'}[Bridge.mode])+'</b></div>'+
-    '<div class="field"><label>Рабочая папка (workspace)</label><input type="text" id="setws" value="'+esc(S.ws)+'"></div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" data-x1="applyws">Применить папку</button><button class="btn" data-x1="ping">Проверить связь</button></div>'+
-    '<div class="proto"><b>Протокол моста WebView2</b><br>'+
-    'JS → C# (hostObject <code>spectre</code>): <code>Execute(code)</code> <code>Attach(pid)</code> <code>Kill()</code> <code>GetProcesses()</code> <code>ListScripts()</code> <code>ReadScript(path)</code> <code>SaveScript(path, code)</code> <code>DeleteScript(path)</code> <code>RenameScript(a, b)</code> <code>SetWorkspace(path)</code> <code>OpenFolder()</code> <code>Ping()</code> <code>Minimize()</code> <code>CloseApp()</code><br>'+
-    'C# → JS (<code>PostWebMessageAsString</code>): <code>{t:"output",level,text}</code> · <code>{t:"open",name,code}</code> · <code>{t:"attached",pid,name}</code> · <code>{t:"detached"}</code> · <code>{t:"files",list}</code> · <code>{t:"theme",vars}</code> · <code>{t:"toast",text,level}</code> · <code>{t:"workspace",path}</code><br>'+
-    'Инжекшен из C#: <code>window.SPECTRE.openTab / .log / .execute / .setTheme</code></div>'+
-    '<div class="setsec">Данные</div>'+
-    '<button class="btn" data-x1="wipe" style="border-color:var(--err);color:var(--err)">Очистить локальные данные</button>'
-  }).then(()=>{
-    const w=$('#setws'); /* уже закрыто — значение читаем до закрытия через делегирование ниже */
-  });
-  /* живые обработчики внутри модалки */
-  modalEl.addEventListener('click',e=>{
-    const s=e.target.closest('[data-sw]');
-    if(s){const id=s.dataset.sw;
-      if(id==='custom'){if(!S.custom){S.custom={};Object.keys(FIELD_LBL).forEach(k=>S.custom[k]=getComputedStyle(root).getPropertyValue(k).trim())}applyTheme('custom')}
-      else applyTheme(id);
-      modalEl.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.sw===S.theme));
-      toast('Тема: '+(id==='custom'?'Своя':THEMES[id].name));}
-    const x=e.target.closest('[data-x1]');
-    if(x){const a=x.dataset.x1;
-      if(a==='resetc'){S.custom=null;applyTheme(S.theme==='custom'?'plasma':S.theme);toast('Своя тема сброшена','warn')}
-      if(a==='applyws'){const i=$('#setws');if(i&&i.value.trim()){Bridge.setws(i.value.trim());$('#wstxt').textContent=i.value.trim();toast('Workspace обновлён','ok')}}
-      if(a==='ping'){Bridge.ping().then(r=>toast('Пинг: '+(r&&r.ms!=null?r.ms+' мс':'ok')+' · '+(r&&r.v||'мост')),'').catch(()=>toast('Бэкенд не отвечает','err'))}
-      if(a==='wipe'){ask({title:'Очистить всё',html:'<p style="font-size:12px">Удалить все локальные данные (темы, сессия, демо-файлы)?</p>',ok:'Стереть',danger:true}).then(v=>{if(v){localStorage.clear();location.reload()}})}}
-  });
-  modalEl.addEventListener('input',e=>{
-    const c=e.target.closest('[data-cv]');
-    if(c){const k=c.dataset.cv;S.custom=S.custom||{};S.custom[k]=c.value;root.style.setProperty(k,c.value);
-      if(S.theme!=='custom'){S.theme='custom';ls.set('sp.theme','custom');$('#sttheme').textContent='Своя';modalEl.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.sw==='custom'))}
-      ls.set('sp.custom',S.custom);return}
-    const r=e.target.closest('[data-r]');
-    if(r){const k=r.dataset.r;S.settings[k]=+r.value;
-      modalEl.querySelector('[data-rv="'+k+'"]').textContent=k==='fs'?r.value+'px':r.value;
-      if(k==='fs')root.style.setProperty('--fs',r.value+'px');saveSoon();return}
-    const ch=e.target.closest('[data-ch]');
-    if(ch){S.settings[ch.dataset.ch]=ch.checked;
-      if(ch.dataset.ch==='glow')document.body.classList.toggle('noglow',!ch.checked);
-      if(ch.dataset.ch==='wrap'){ta.wrap=ch.checked?'soft':'off';$('#edwrap').classList.toggle('wrap',ch.checked);paint()}
-      saveSoon();}
-  });
-  /* значение workspace фиксируем до закрытия модалки */
-}
-function toHex(v){v=(v||'').trim();if(/^#[0-9a-f]{6}$/i.test(v))return v;
-  const m=v.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);if(m)return '#'+m[1]+m[1]+m[2]+m[2]+m[3]+m[3];
-  const rgb=v.match(/\d+/g);if(rgb&&rgb.length>=3)return '#'+rgb.slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
-  return '#000000'}
+async function save(){
+const t=cur();if(!t)return;
+let name=t.path;
+if(!name){saveAs();return}
+await callBridge('SaveScript',{name,content:t.content});
+t.saved=t.content;markDirty();updSbFile();
+await refreshFiles();toast('ok','Сохранено: '+name)}
+function saveAs(){
+const t=cur();if(!t)return;
+promptBox('Сохранить как',t.path||t.name.replace(/ \(копия\)/,''),async v=>{
+v=(v||'').trim();if(!v)return;
+if(!v.includes('.'))v+='.lua';
+await callBridge('SaveScript',{name:v,content:t.content});
+t.path=v;t.name=v;t.saved=t.content;
+renderTabs();await refreshFiles();toast('ok','Сохранено: '+v)})}
 
-/* ================= СНИППЕТЫ ================= */
-const SNIPPETS=[
- {label:'Приветствие',code:'-- Сниппет: приветствие\nprint("Привет из SPECTRE!")\nprint("Версия интерфейса: "..window and "web" or "lua")\n'},
- {label:'WalkSpeed 60',code:'-- Сниппет: скорость\nlocal hum = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\nif hum then\n    hum.WalkSpeed = 60\n    print("WalkSpeed -> 60")\nend\n'},
- {label:'JumpPower 120',code:'-- Сниппет: прыжок\nlocal hum = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")\nif hum then\n    hum.JumpPower = 120\n    print("JumpPower -> 120")\nend\n'},
- {label:'Мониторинг FPS',code:'-- Сниппет: FPS-монитор (демо)\nlocal frames, last = 0, os.clock()\nprint("замер FPS начат")\nwarn("демо: реальный рендер-хук доступен из WPF-бэкенда")\n'}
-];
+function readDropFiles(list){
+let n=0;
+Array.from(list).forEach(f=>{
+if(!/\.(lua|luau|txt)$/i.test(f.name))return;
+n++;
+const rd=new FileReader();
+rd.onload=()=>{newTab(f.name,String(rd.result||''),{saved:''});toast('ok','Открыт: '+f.name)};
+rd.readAsText(f)});
+if(!n)toast('warn','Поддерживаются файлы .lua / .luau / .txt')}
 
-/* ================= ДИСПЕТЧЕР ДЕЙСТВИЙ ================= */
-function doAct(a){
-  switch(a){
-    case 'exec':execActive();break;
-    case 'attach':doAttach();break;
-    case 'kill':doKill();break;
-    case 'save':saveActive();break;
-    case 'newtab':openTab();break;
-    case 'newfile':newFile();break;
-    case 'refreshfiles':refreshFiles().then(()=>toast('Список обновлён'));break;
-    case 'openfolder':Bridge.openfolder();break;
-    case 'editws':ask({title:'Рабочая папка',html:'<div class="field"><label>Путь workspace</label><input type="text" value="'+esc(S.ws)+'"></div>',ok:'Применить'}).then(v=>{if(v&&v.trim()){Bridge.setws(v.trim());$('#wstxt').textContent=v.trim();toast('Workspace обновлён','ok')}});break;
-    case 'snippets':{const r=document.querySelector('[data-act=snippets]').getBoundingClientRect();
-      menu(r.left,r.bottom+6,SNIPPETS.map(s=>({label:s.label,fn:()=>openTab({name:s.label.replace(/\s/g,'-').toLowerCase()+'.lua',code:s.code,dirty:true})})));break}
-    case 'procs':{const r=document.querySelector('[data-act=procs]').getBoundingClientRect();
-      loadProcs().then(ps=>menu(r.left,r.bottom+6,ps.length?ps.map(p=>({label:p.name+' · '+p.pid,fn:()=>{S.proc=p;$('#proctxt').textContent=p.name.slice(0,18)+'…';toast('Выбран: '+p.name)}})):[{label:'Процессы не найдены',fn:()=>{}}]));break}
-    case 'cycletheme':cycleTheme();break;
-    case 'settings':openSettings();break;
-    case 'min':Bridge.minimize();break;
-    case 'close':Bridge.close();break;
-    case 'clearcon':clog.innerHTML='';S.conN=0;$('#ccount').textContent='0 строк';break;
-    case 'copylog':{const txt=[...clog.children].map(x=>x.textContent).join('\n');
-      navigator.clipboard&&navigator.clipboard.writeText(txt);toast('Лог скопирован','ok');break}
-    case 'autoscroll':S.settings.autoscroll=!S.settings.autoscroll;
-      $('#asbtn').style.color=S.settings.autoscroll?'var(--acc)':'';saveSoon();
-      if(S.settings.autoscroll)clog.scrollTop=clog.scrollHeight;break;
-    case 'togglecon':{const c=$('#console');c.style.display=c.style.display==='none'?'':'none';break}
-  }
-}
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-act]');
-  if(b&&b.closest('.toolbar,.titlebar,.chead,.fhead'))doAct(b.dataset.act);
-});
+let dragC=0;
+window.addEventListener('dragenter',e=>{
+if(dragTabId)return;
+if(Array.from(e.dataTransfer.types).indexOf('Files')>=0){dragC++;$('dropHint').classList.add('show')}});
+window.addEventListener('dragover',e=>{if(!dragTabId)e.preventDefault()});
+window.addEventListener('dragleave',()=>{if(dragTabId)return;if(--dragC<=0){dragC=0;$('dropHint').classList.remove('show')}});
+window.addEventListener('drop',e=>{
+if(dragTabId)return;
+e.preventDefault();dragC=0;$('dropHint').classList.remove('show');
+if(e.dataTransfer.files.length)readDropFiles(e.dataTransfer.files)});
 
-/* ================= DRAG & DROP ФАЙЛОВ ================= */
-const dropEl=$('#drop');let depth=0;
-const hasFiles=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
-addEventListener('dragenter',e=>{if(!hasFiles(e))return;e.preventDefault();depth++;dropEl.classList.add('on')});
-addEventListener('dragleave',e=>{if(!hasFiles(e))return;depth=Math.max(0,depth-1);if(!depth)dropEl.classList.remove('on')});
-addEventListener('dragover',e=>{if(hasFiles(e))e.preventDefault()});
-addEventListener('drop',async e=>{
-  if(!hasFiles(e))return;e.preventDefault();depth=0;dropEl.classList.remove('on');
-  for(const f of e.dataTransfer.files){
-    if(!/\.(lua|luau|txt|json)$/i.test(f.name)){toast('Пропущен: '+f.name+' (нужен .lua)','warn');continue}
-    const code=await f.text();
-    openTab({name:f.name,code,path:null,dirty:true});
-    log('sys','Импортирован: '+f.name+' ('+code.length+' симв.)');
-  }
-  toast('Файлы импортированы во вкладки','ok');
-});
+function applyAll(){
+const r=document.documentElement.style;
+Object.keys(vars).forEach(k=>r.setProperty(k,vars[k]));
+r.setProperty('--rad',rad+'px');r.setProperty('--fs',fs+'px');
+document.body.classList.toggle('noglow',!glow);
+$('sbTheme').textContent=(SKINS[themeName]&&SKINS[themeName].label)||'Своя тема';
+localStorage.setItem('spectre_theme_v2',JSON.stringify({name:themeName,vars,rad,fs,glow}));
+syncControls();renderEditor()}
+function applySkin(k){
+const s=SKINS[k];vars=JSON.parse(JSON.stringify(s.vars));themeName=k;rad=s.rad;applyAll();
+toast('ok','Скин применён: '+s.label)}
+function setVar(k,v){vars[k]=v;themeName='custom';applyAll()}
+function loadTheme(){
+try{const s=JSON.parse(localStorage.getItem('spectre_theme_v2'));
+if(s&&s.vars&&s.vars['--bg']){vars=s.vars;themeName=s.name;rad=s.rad!=null?s.rad:10;fs=s.fs!=null?s.fs:14;glow=s.glow!==false;applyAll();return}}catch(e){}
+vars=JSON.parse(JSON.stringify(SKINS.plasma.vars));themeName='plasma';rad=SKINS.plasma.rad;applyAll()}
+function syncControls(){
+document.querySelectorAll('#varGrid input[type=color]').forEach(inp=>{if(vars[inp.dataset.var])inp.value=vars[inp.dataset.var]});
+$('rngRad').value=rad;$('outRad').textContent=rad+'px';
+$('rngFs').value=fs;$('outFs').textContent=fs+'px';
+$('tglGlow').checked=glow;
+document.querySelectorAll('.skin').forEach(s=>s.classList.toggle('on',s.dataset.skin===themeName))}
+function renderSkins(){
+$('skinGrid').innerHTML=Object.keys(SKINS).map(k=>{
+const v=SKINS[k].vars;
+return '<button class="skin'+(k===themeName?' on':'')+'" data-skin="'+k+'"><span class="sw">'+
+['--bg3','--acc','--acc2','--syn-k','--syn-s'].map(c=>'<i style="background:'+v[c]+'"></i>').join('')+
+'</span><span class="sn">'+SKINS[k].label.toUpperCase()+'</span></button>'}).join('');
+document.querySelectorAll('.skin').forEach(s=>s.onclick=()=>applySkin(s.dataset.skin))}
+function renderVarControls(){
+$('varGrid').innerHTML=VAR_DEFS.map(d=>'<div class="vrow"><label>'+d[1]+'</label><input type="color" data-var="'+d[0]+'"></div>').join('');
+document.querySelectorAll('#varGrid input[type=color]').forEach(inp=>inp.addEventListener('input',()=>setVar(inp.dataset.var,inp.value)))}
 
-/* ================= СПЛИТТЕР / ПАНЕЛИ ================= */
-const spl=$('#splitter'),con=$('#console');
-con.style.height=S.conH+'px';
-spl.addEventListener('pointerdown',e=>{
-  spl.classList.add('on');spl.setPointerCapture(e.pointerId);
-  const base=e.clientY,start=con.offsetHeight;
-  const move=ev=>{let h=start+(base-ev.clientY);h=Math.max(60,Math.min(h,innerHeight*.65));
-    con.style.height=h+'px';S.conH=h};
-  const up=()=>{spl.classList.remove('on');removeEventListener('pointermove',move);removeEventListener('pointerup',up);ls.set('sp.conH',S.conH)};
-  addEventListener('pointermove',move);addEventListener('pointerup',up);
-});
-$('#collapse').addEventListener('click',()=>{
-  const f=$('#filespane'),c=$('#collapse');
-  f.classList.toggle('hide');c.classList.toggle('off',f.classList.contains('hide'));
-});
+function openDrawer(){$('drawer').classList.add('open');$('scrim').classList.add('show')}
+function closeDrawer(){$('drawer').classList.remove('open');$('scrim').classList.remove('show')}
 
-/* ================= БЫСТРАЯ КОМАНДА ================= */
-$('#cinput').addEventListener('keydown',async e=>{
-  if(e.key!=='Enter')return;
-  const v=e.target.value.trim();if(!v)return;
-  e.target.value='';log('cmd','> '+v);
-  if(!S.attached){log('warn','Нет подключения — команда не отправлена');return}
-  await Bridge.execute(v);
-});
+window.addEventListener('message',e=>{
+let d=e.data;
+if(typeof d==='string'){try{d=JSON.parse(d)}catch(_){return}}
+if(!d||!d.t)return;
+switch(d.t){
+case 'output':push(d.level||'info',d.text||'');break;
+case 'open':newTab(d.name||'script.lua',d.code||'',{saved:''});toast('ok','Скрипт получен из WPF: '+(d.name||'script.lua'));break;
+case 'attached':setConnected(true,d.pid);break;
+case 'detached':setConnected(false);break;
+case 'files':files=d.files||[];renderFiles();break;
+case 'theme':if(d.theme){vars=d.theme;themeName=d.name||'custom';applyAll()}break;
+case 'toast':toast(d.kind||'info',d.text||'');break;
+case 'workspace':wsPath=d.path||wsPath;renderFiles();break}});
+window.SPECTRE={
+openTab:(n,c)=>newTab(n||'script.lua',c||'',{saved:''}),
+log:(lv,t)=>push(lv||'info',t||''),
+execute:()=>execute(),
+setTheme:(t,n)=>{if(t){vars=t;themeName=n||'custom';applyAll()}},
+toast,files:l=>{files=l||[];renderFiles()},
+attached:p=>setConnected(true,p),detached:()=>setConnected(false)};
 
-/* ================= ТИКЕРЫ ================= */
-setInterval(()=>{$('#stclock').textContent=now();
-  if(S.attached){const s=Math.floor((Date.now()-S.attachAt)/1000);
-    $('#stattachtxt').textContent='подключено '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}},1000);
+document.addEventListener('keydown',e=>{
+const mod=e.ctrlKey||e.metaKey;
+if(mod&&e.key==='Enter'){e.preventDefault();execute()}
+else if(mod&&(e.key==='s'||e.key==='S'||e.key==='ы'||e.key==='Ы')){e.preventDefault();save()}
+else if(mod&&(e.key==='t'||e.key==='T'||e.key==='е'||e.key==='Е')){e.preventDefault();newTab()}
+else if(mod&&(e.key==='w'||e.key==='W'||e.key==='ц'||e.key==='Ц')){e.preventDefault();if(activeId)closeTab(activeId)}
+else if(mod&&e.key==='Tab'){e.preventDefault();
+if(tabs.length>1){const i=tabs.findIndex(t=>t.id===activeId);activateTab(tabs[(i+(e.shiftKey?-1:1)+tabs.length)%tabs.length].id)}}
+else if(e.key==='Escape'){closeCtx();closeModal();closeDrawer()}});
+document.addEventListener('click',e=>{if(!e.target.closest('#ctx'))closeCtx()});
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
 
-/* ================= СТАРТ ================= */
-(async function init(){
-  Mock.init();
-  applyTheme(S.theme);
-  ta.wrap=S.settings.wrap?'soft':'off';
-  $('#edwrap').classList.toggle('wrap',S.settings.wrap);
-  $('#asbtn').style.color=S.settings.autoscroll?'var(--acc)':'';
-  $('#wstxt').textContent=S.ws;
-  log('sys','SPECTRE v1.0.7 — интерфейс загружен');
-  /* рукопожатие с WPF */
-  try{
-    const p=await Promise.race([Bridge.ping(),new Promise((_,rj)=>setTimeout(()=>rj(0),900))]);
-    if(Bridge.mode==='wpf'||p&&p.v&&p.v!=='demo'){
-      Bridge.mode='wpf';S.mode='wpf';
-      $('#modechip').className='modechip wpf';$('#modetxt').textContent='WPF BRIDGE';
-      log('ok','Мост WPF активен (ответ за '+(p.ms!=null?p.ms:'?')+' мс)');
-    }else throw 0;
-  }catch(e){
-    if(window.chrome&&window.chrome.webview&&Bridge.mode!=='wpf'){
-      $('#modetxt').textContent='WPF MSG';log('sys','Режим postMessage: добавьте hostObject "spectre" для полного API');
-    }else{
-      $('#modechip').className='modechip demo';$('#modetxt').textContent='DEMO';
-      log('warn','Демо-режим: WPF не обнаружен, бэкенд эмулируется в браузере');
-    }
-  }
-  log('sys','Workspace: '+S.ws);
-  /* сессия */
-  const ses=ls.get('sp.session',null);
-  if(ses&&ses.tabs&&ses.tabs.length){
-    ses.tabs.forEach(t=>S.tabs.push(t));S.seq=ses.seq||S.tabs.length+1;
-    S.active=Math.min(ses.active||0,S.tabs.length-1);
-  }else{
-    openTab({name:'welcome.lua',code:await Mock.read('welcome.lua'),path:'welcome.lua'});
-  }
-  renderTabs();refreshEditor();
-  await refreshFiles();
-  syncAttachUI();
-  log('ok','Готово. Ctrl+Enter — выполнить, Ctrl+S — сохранить.');
-  ta.focus();
-  addEventListener('beforeunload',saveState);
-})();
+$('btnExec').onclick=execute;
+$('btnAttach').onclick=attachToggle;
+$('btnSave').onclick=save;
+$('btnSaveAs').onclick=saveAs;
+$('btnImport').onclick=()=>$('filePick').click();
+$('filePick').addEventListener('change',()=>{readDropFiles($('filePick').files);$('filePick').value=''});
+$('btnNewTab').onclick=()=>newTab();
+$('btnSidebar').onclick=()=>document.body.classList.toggle('nosb');
+$('btnTheme').onclick=openDrawer;
+$('btnSettings').onclick=openDrawer;
+$('btnDrawerClose').onclick=closeDrawer;
+$('scrim').onclick=closeDrawer;
+$('sbTheme').onclick=openDrawer;
+$('btnRefresh').onclick=async()=>{await refreshFiles();toast('info','Список обновлён')};
+$('btnNewFile').onclick=()=>{
+let n='Script '+(files.length+1)+'.lua';let i=1;
+while(files.some(f=>f.name===n))n='Script '+(files.length+1)+' ('+(i++)+').lua';
+callBridge('SaveScript',{name:n,content:'-- '+n+'\nprint("Hello from SPECTRE")\n'}).then(async()=>{await refreshFiles();openFile(n)})};
+$('btnOpenFolder').onclick=()=>callBridge('OpenFolder');
+$('btnWorkspace').onclick=()=>callBridge('OpenFolder');
+$('fileSearch').addEventListener('input',renderFiles);
+$('btnClearCon').onclick=()=>{entries=[];renderCon();toast('info','Консоль очищена')};
+$('btnCopyCon').onclick=()=>{
+const txt=entries.map(e=>'['+e.time+'] '+e.text).join('\n');
+try{navigator.clipboard.writeText(txt)}catch(e){}
+toast('ok','Консоль скопирована ('+entries.length+' строк)')};
+$('btnConToggle').onclick=()=>$('console').classList.toggle('collapsed');
+document.querySelectorAll('.chip-f').forEach(c=>c.onclick=()=>{
+conFilter=c.dataset.f;
+document.querySelectorAll('.chip-f').forEach(x=>x.classList.toggle('on',x===c));
+renderCon()});
+$('cmdInput').addEventListener('keydown',e=>{
+e.stopPropagation();
+if(e.key!=='Enter')return;
+const v=e.target.value.trim();if(!v)return;
+e.target.value='';
+push('cmd','› '+v);
+if(!connected){push('warn','нет подключения — команда не отправлена');return}
+if(getHost())callBridge('Execute',{name:'консоль',code:v});
+else demoRun(v,'консоль')});
+$('btnMin').onclick=()=>callBridge('Minimize');
+$('btnClose').onclick=()=>{
+if(getHost()){callBridge('CloseApp');return}
+confirmBox('Закрыть SPECTRE','В браузере закрыть окно нельзя — просто закрой вкладку. Выйти из демо?',()=>toast('info','Демо завершено. Обнови страницу, чтобы вернуться.'))};
+$('titlebar').addEventListener('mousedown',e=>{if(!e.target.closest('button')&&getHost())callBridge('DragWindow')});
+$('connPill').onclick=()=>toast('info',connected?'Подключено к Roblox · PID '+pid:'Нажми «Подключить», чтобы выбрать процесс');
+$('btnPing').onclick=async()=>{
+const r=await callBridge('Ping');
+if(r&&r.ok)toast('ok','Мост активен · '+Math.round(r.ms)+' мс');
+else toast('warn','Бэкенд не отвечает — работаю в демо-режиме')};
+$('rngRad').addEventListener('input',()=>{rad=+$('rngRad').value;applyAll()});
+$('rngFs').addEventListener('input',()=>{fs=+$('rngFs').value;applyAll()});
+$('tglGlow').addEventListener('change',()=>{glow=$('tglGlow').checked;applyAll()});
+$('btnThemeReset').onclick=()=>applySkin('plasma');
+$('btnThemeExport').onclick=()=>{
+const j=JSON.stringify({name:themeName,vars,rad,fs,glow},null,1);
+try{navigator.clipboard.writeText(j)}catch(e){}
+toast('ok','Тема скопирована в буфер как JSON')};
+$('btnThemeImport').onclick=()=>{
+openModal('<div class="m-title">Импорт темы</div><textarea class="minput" id="mTa" placeholder="{&quot;name&quot;:&quot;моя&quot;,&quot;vars&quot;:{&quot;--acc&quot;:&quot;#ff0000&quot;},&quot;rad&quot;:10,&quot;fs&quot;:14,&quot;glow&quot;:true}"></textarea><div class="m-btns"><button class="mbtn" id="mNo">Отмена</button><button class="mbtn primary" id="mYes">Применить</button></div>');
+$('mNo').onclick=closeModal;
+$('mYes').onclick=()=>{
+const raw=$('mTa').value;closeModal();
+try{const s=JSON.parse(raw);
+if(!s.vars||!s.vars['--bg'])throw 0;
+vars=Object.assign(JSON.parse(JSON.stringify(SKINS.plasma.vars)),s.vars);
+themeName=s.name||'custom';
+rad=s.rad!=null?+s.rad:10;fs=s.fs!=null?+s.fs:14;glow=s.glow!==false;
+applyAll();toast('ok','Тема импортирована')}
+catch(e){toast('err','Некорректный JSON темы')}})};
+
+setInterval(()=>{$('sbClock').textContent=new Date().toLocaleTimeString('ru-RU')},1000);
+setInterval(()=>{if(connected&&attachedAt){const s=Math.floor((Date.now()-attachedAt)/1000);$('sbTimer').textContent='в сети '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}},1000);
+
+updMode();
+loadTheme();
+renderSkins();
+renderVarControls();
+if(!getHost())seedFS();
+refreshFiles();
+newTab('main.lua','-- SPECTRE: набросок\n-- Ctrl+Enter — выполнить, Ctrl+S — сохранить\nlocal lp = game:GetService("Players").LocalPlayer\n\nlocal function greet(who)\n  print("Привет, " .. who)\nend\n\ngreet(lp.Name)\nwarn("Скрипт-заглушка готов к работе")\n');
+push('sys','SPECTRE v2.4.1 — интерфейс загружен');
+push(getHost()?'info':'warn',getHost()?'Обнаружен мост WebView2 — команды уходят в WPF':'Демо-режим: выполнение и файлы эмулируются. Встрой файл в WebView2, чтобы включить бэкенд.');
+renderCon();
 </script>
 </body>
 </html>
