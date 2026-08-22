@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SPECTRE — Lua Executor</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff6a3d' d='M13 2 4 14h6l-1 8 9-12h-6l1-8z'/%3E%3C/svg%3E">
+<link rel="icon" href="image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff6a3d' d='M13 2 4 14h6l-1 8 9-12h-6l1-8z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
@@ -33,7 +33,7 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 
 /* ===== тайтлбар ===== */
 #titlebar{height:46px;flex:none;display:flex;align-items:center;gap:12px;padding:0 14px;
-  background:color-mix(in srgb,var(--bg2) 92%,transparent);border-bottom:1px solid var(--line);user-select:none}
+  background:color-mix(in srgb,var(--bg2) 92%,transparent);border-bottom:1px solid var(--line);user-select:none;cursor:default}
 .logo{display:flex;align-items:center;gap:9px}
 .logo svg{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--acc) 70%,transparent))}
 .logo b{font-family:var(--disp);font-weight:900;font-size:15px;letter-spacing:.14em}
@@ -59,6 +59,8 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 .btn.primary.running{animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{box-shadow:0 0 34px color-mix(in srgb,var(--acc) 85%,transparent)}}
 .btn.ghost{background:transparent}
+.btn.help{border-color:color-mix(in srgb,var(--acc2) 55%,transparent);color:var(--acc2)}
+.btn.help:hover{border-color:var(--acc2);box-shadow:0 0 16px color-mix(in srgb,var(--acc2) 30%,transparent)}
 .sep{width:1px;height:24px;background:var(--line);margin:0 4px;flex:none}
 #btnTheme{margin-left:auto}
 .status{display:flex;align-items:center;gap:8px;height:34px;padding:0 13px;border:1px solid var(--line);
@@ -76,6 +78,7 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 .side-head .cnt{font-size:10px;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);
   border-radius:10px;padding:1px 7px}
 .side-head button{margin-left:auto;width:26px;height:26px;border-radius:6px;display:grid;place-items:center;color:var(--mut);transition:.15s}
+.side-head button+button{margin-left:0}
 .side-head button:hover{background:var(--bg3);color:var(--acc)}
 #fileSearch{margin:0 12px 8px;height:30px;background:var(--bg);border:1px solid var(--line);border-radius:7px;
   color:var(--text);padding:0 10px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color .15s}
@@ -95,16 +98,18 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 
 /* ===== рабочая зона ===== */
 #workspace{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
-#tabbar{height:38px;flex:none;display:flex;align-items:stretch;gap:4px;padding:6px 10px 0;
-  background:color-mix(in srgb,var(--bg2) 70%,transparent);white-space:nowrap}
-#tabsList{flex:1;display:flex;align-items:stretch;gap:4px;overflow-x:auto;min-width:0}
-#tabsList::-webkit-scrollbar{height:0}
+#tabbar{height:38px;flex:none;display:flex;align-items:stretch;gap:6px;padding:6px 10px 0;overflow-x:auto;
+  background:color-mix(in srgb,var(--bg2) 70%,transparent);white-space:nowrap;scrollbar-width:none}
+#tabbar::-webkit-scrollbar{height:0}
+#tabsList{display:flex;gap:4px;align-items:stretch;min-width:0}
 .tab{display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:8px 8px 0 0;font-size:12px;
-  color:var(--mut);cursor:pointer;border:1px solid transparent;border-bottom:none;transition:.13s;max-width:210px;position:relative;top:1px}
+  color:var(--mut);cursor:grab;border:1px solid transparent;border-bottom:none;transition:background .13s,color .13s;max-width:210px;position:relative;top:1px}
+.tab:active{cursor:grabbing}
 .tab:hover{color:var(--text);background:var(--bg3)}
 .tab.active{background:var(--bg3);color:var(--text);border-color:var(--line)}
 .tab.active::before{content:'';position:absolute;top:-1px;left:8px;right:8px;height:2px;border-radius:2px;
   background:var(--acc);box-shadow:0 0 8px var(--acc)}
+.tab.dragging{opacity:.45;outline:1px dashed var(--acc)}
 .tab .tname{overflow:hidden;text-overflow:ellipsis}
 .tab .tdirty{color:var(--warn)}
 .tab .tx{width:18px;height:18px;flex:none;display:grid;place-items:center;border-radius:5px;color:var(--mut);font-size:13px;line-height:1}
@@ -138,6 +143,14 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 .line.err .msg{color:var(--err)}
 .line.sys .msg{color:var(--acc)}
 
+/* ===== контекстное меню вкладки ===== */
+#ctxMenu{position:fixed;z-index:140;display:none;min-width:172px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+#ctxMenu.show{display:block;animation:pop .14s ease-out}
+#ctxMenu button{display:flex;width:100%;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:12.5px;color:var(--text);transition:.12s}
+#ctxMenu button:hover{background:var(--bg3);color:var(--acc)}
+#ctxMenu button.danger:hover{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
+
 /* ===== панель тем ===== */
 #themePanel{position:fixed;top:0;right:0;bottom:0;width:308px;z-index:50;display:flex;flex-direction:column;
   background:var(--bg2);border-left:1px solid var(--line);transform:translateX(103%);
@@ -161,9 +174,44 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
 .crow input[type=range]{width:130px;accent-color:var(--acc)}
 .tp-foot{flex:none;padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
 .tp-foot .btn{flex:1;justify-content:center}
-.bridge-hint{margin:14px 16px 16px;padding:10px;border:1px dashed var(--line);border-radius:8px;
-  font-size:10px;line-height:1.7;color:var(--mut)}
-.bridge-hint b{color:var(--acc2)}
+
+/* ===== WPF-гид ===== */
+#docsModal{position:fixed;inset:0;z-index:130;display:none;place-items:center;background:rgba(4,6,10,.72);backdrop-filter:blur(6px)}
+#docsModal.show{display:grid}
+.docs-box{width:min(980px,95vw);height:min(680px,90vh);display:flex;flex-direction:column;background:var(--bg2);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 44px color-mix(in srgb,var(--acc) 12%,transparent);
+  animation:pop .25s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes pop{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1}}
+.docs-head{flex:none;display:flex;align-items:baseline;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.docs-head b{font-family:var(--disp);font-size:14px;letter-spacing:.14em;font-weight:900}
+.docs-head small{color:var(--mut);font-size:11px}
+.docs-head button{margin-left:auto;width:30px;height:30px;border-radius:7px;color:var(--mut);display:grid;place-items:center;align-self:center}
+.docs-head button:hover{background:var(--bg3);color:var(--err)}
+.docs-main{flex:1;display:flex;min-height:0}
+.docs-nav{width:210px;flex:none;border-right:1px solid var(--line);padding:14px 10px;overflow-y:auto}
+.docs-nav button{display:block;width:100%;text-align:left;padding:9px 11px;border-radius:7px;color:var(--mut);font-size:11.5px;margin-bottom:3px;transition:.13s;line-height:1.45}
+.docs-nav button:hover{background:var(--bg3);color:var(--text)}
+.docs-nav button.on{color:var(--acc);background:color-mix(in srgb,var(--acc) 11%,transparent)}
+.docs-body{flex:1;overflow-y:auto;padding:24px 28px;min-height:0}
+.dsec{margin-bottom:38px;scroll-margin-top:8px}
+.dsec h3{font-family:var(--disp);font-size:14.5px;letter-spacing:.05em;display:flex;gap:12px;align-items:baseline;margin-bottom:12px;font-weight:700}
+.dsec h3 .n{color:var(--acc);font-size:24px;font-weight:900;text-shadow:0 0 16px color-mix(in srgb,var(--acc) 55%,transparent)}
+.dsec p,.dsec li{font-size:12.5px;line-height:1.8;color:var(--mut)}
+.dsec p{margin-bottom:8px}
+.dsec ul{margin:6px 0 10px 18px}
+.dsec li{margin-bottom:4px}
+.dsec b{color:var(--text)}
+.dsec .ic{color:var(--acc2)}
+.codeWrap{position:relative;margin:12px 0}
+.codeWrap pre{background:#070a10;border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;
+  font-size:11.8px;line-height:1.66;color:#cfe0f4}
+.copyBtn{position:absolute;top:8px;right:8px;font-size:9.5px;letter-spacing:.12em;padding:4px 10px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--line);color:var(--mut);transition:.15s}
+.copyBtn:hover{color:var(--acc);border-color:var(--acc)}
+.tip{border-left:3px solid var(--acc2);background:color-mix(in srgb,var(--acc2) 7%,transparent);
+  padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:12px;line-height:1.7;color:var(--mut)}
+.tip b{color:var(--acc2)}
 
 /* ===== оверлеи ===== */
 #dropOverlay{position:fixed;inset:0;z-index:99;display:none;place-items:center;
@@ -173,7 +221,7 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
   font-family:var(--disp);font-weight:700;letter-spacing:.1em;color:var(--acc);
   box-shadow:0 0 60px color-mix(in srgb,var(--acc) 25%,transparent);animation:pulse2 1.2s infinite}
 @keyframes pulse2{50%{transform:scale(1.02)}}
-#toast{position:fixed;right:18px;bottom:18px;z-index:120;padding:11px 18px;border-radius:9px;
+#toast{position:fixed;right:18px;bottom:18px;z-index:150;padding:11px 18px;border-radius:9px;
   background:var(--bg3);border:1px solid var(--acc);color:var(--text);font-size:12.5px;
   box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 20px color-mix(in srgb,var(--acc) 25%,transparent);
   opacity:0;transform:translateY(14px);pointer-events:none;transition:.25s}
@@ -211,6 +259,9 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
     </button>
     <button class="btn ghost" id="btnNew">+ Вкладка</button>
     <input type="file" id="importFile" accept=".lua,.luau,.txt" hidden>
+    <button class="btn help" id="btnDocs">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-2.5"/></svg>WPF-гид
+    </button>
     <button class="btn" id="btnTheme">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="8" r="1.4" fill="currentColor"/><circle cx="8.5" cy="13" r="1.4" fill="currentColor"/><circle cx="15.5" cy="13" r="1.4" fill="currentColor"/></svg>Темы
     </button>
@@ -245,6 +296,14 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
   </div>
 </div>
 
+<!-- контекстное меню вкладки -->
+<div id="ctxMenu">
+  <button data-act="ren">✎&nbsp; Переименовать</button>
+  <button data-act="dup">⧉&nbsp; Дублировать</button>
+  <button data-act="close" class="danger">✕&nbsp; Закрыть</button>
+</div>
+
+<!-- панель тем -->
 <div id="themePanel">
   <div class="tp-head"><b>ТЕМЫ / СКИНЫ</b>
     <button id="btnThemeClose"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
@@ -263,10 +322,216 @@ button{font-family:var(--mono);cursor:pointer;border:none;background:none;color:
     <button class="btn primary" id="btnThemeSave">Сохранить тему</button>
     <button class="btn ghost" id="btnThemeReset">Сброс</button>
   </div>
-  <div class="bridge-hint">
-    <b>Мост WebView2 → WPF:</b> hostObjects.spectre — Execute(code), Attach(pid), SaveFile(name,code), DeleteFile(name), ListFiles().<br>
-    <b>WPF → JS:</b> PostWebMessageAsString: {"t":"log","msg":"…"} | {"t":"open","name","code"} | {"t":"files",[…]} | {"t":"theme",{…}}.<br>
-    Без WPF работает демо-режим.
+</div>
+
+<!-- WPF-гид -->
+<div id="docsModal">
+  <div class="docs-box">
+    <div class="docs-head"><b>WPF-ГИД</b><small>подключение этого UI к бэкенду на WPF .NET 8</small>
+      <button id="btnDocsClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="docs-main">
+      <div class="docs-nav">
+        <button data-sec="s1" class="on">01 · Проект и NuGet</button>
+        <button data-sec="s2">02 · XAML: окно без рамки</button>
+        <button data-sec="s3">03 · Инициализация WebView2</button>
+        <button data-sec="s4">04 · Мост SpectreBridge (все кнопки)</button>
+        <button data-sec="s5">05 · Команды WPF → UI</button>
+        <button data-sec="s6">06 · Перетаскивание окна</button>
+      </div>
+      <div class="docs-body" id="docsBody">
+
+        <div class="dsec" id="s1">
+          <h3><span class="n">01</span>Проект и NuGet</h3>
+          <p>Создаём обычный WPF-проект на <b>.NET 8</b> и ставим пакет <span class="ic">Microsoft.Web.WebView2</span>. Файл этого интерфейса <span class="ic">index.html</span> просто кладём рядом с exe (в <span class="ic">bin/…/net8.0-windows/</span>).</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>dotnet new wpf -n Spectre
+cd Spectre
+dotnet add package Microsoft.Web.WebView2
+
+# index.html копируем в папку проекта (окажется рядом с exe)</pre></div>
+          <p>Если добавляешь пакет руками, в <span class="ic">.csproj</span> появится:</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>&lt;ItemGroup&gt;
+  &lt;PackageReference Include="Microsoft.Web.WebView2" Version="1.0.*" /&gt;
+&lt;/ItemGroup&gt;</pre></div>
+        </div>
+
+        <div class="dsec" id="s2">
+          <h3><span class="n">02</span>XAML: окно без рамки, WebView2 на всё окно</h3>
+          <p>Убираем системную шапку (<span class="ic">WindowStyle="None"</span>) и растягиваем <span class="ic">WebView2</span> на всё окно — свой тайтлбар, кнопки и перетаскивание рисует сам веб-интерфейс.</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>&lt;Window x:Class="Spectre.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="SPECTRE" Width="1080" Height="680"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="#0b0e15" WindowStartupLocation="CenterScreen"&gt;
+    &lt;Grid&gt;
+        &lt;!-- WebView2 растянут на всё окно --&gt;
+        &lt;wv2:WebView2 x:Name="webView" DefaultBackgroundColor="#0b0e15"/&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre></div>
+          <div class="tip"><b>DefaultBackgroundColor</b> в цвет фона темы (<span class="ic">--bg</span>) убирает белую вспышку при загрузке.</div>
+        </div>
+
+        <div class="dsec" id="s3">
+          <h3><span class="n">03</span>Инициализация WebView2 (MainWindow.xaml.cs)</h3>
+          <p>Главное — зарегистрировать host-объект с именем <b>spectre</b> (имя уже зашито в index.html) <b>до</b> навигации. С этого момента JS видит его как <span class="ic">chrome.webview.hostObjects.spectre</span> и сам дёргает методы C#.</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
+using Microsoft.Web.WebView2.Core;
+
+namespace Spectre;
+
+public partial class MainWindow : Window
+{
+    private CoreWebView2 _core;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+        Loaded += async (_, _) =&gt; await Init();
+    }
+
+    private async Task Init()
+    {
+        await webView.EnsureCoreWebView2Async();
+        _core = webView.CoreWebView2;
+        _core.Settings.AreDefaultContextMenusEnabled = false;
+
+        // 1. Мост: UI будет вызывать методы C# как spectre.Method(...)
+        _core.AddHostObjectToScript("spectre", new SpectreBridge(this));
+
+        // 2. Резервный канал UI -&gt; C# (window.chrome.webview.postMessage)
+        _core.WebMessageReceived += (_, e) =&gt;
+        {
+            string raw = e.TryGetWebMessageAsString();
+            // разбор на свой вкус, например через JsonDocument
+        };
+
+        // 3. Открываем интерфейс (index.html рядом с exe)
+        var html = Path.Combine(AppContext.BaseDirectory, "index.html");
+        await _core.NavigateToFileAsync(html);
+    }
+
+    // Отправка любой команды в UI
+    public void Send(object obj) =&gt;
+        _core?.PostWebMessageAsString(
+            System.Text.Json.JsonSerializer.Serialize(obj));
+}</pre></div>
+        </div>
+
+        <div class="dsec" id="s4">
+          <h3><span class="n">04</span>Мост SpectreBridge — все кнопки сразу</h3>
+          <p>Все кнопки интерфейса <b>уже привязаны</b> к методам этого класса — со стороны UI делать ничего не нужно, просто реализуй методы:</p>
+          <ul>
+            <li><b>«Выполнить»</b> (Ctrl+Enter) → <span class="ic">Execute(lua)</span> — приходит код активной вкладки</li>
+            <li><b>«Подключить / Отключить»</b> → <span class="ic">Attach(0)</span> / <span class="ic">Detach()</span></li>
+            <li><b>«Сохранить»</b> → <span class="ic">SaveFile(name, code)</span></li>
+            <li><b>Удаление файла</b> → <span class="ic">DeleteFile(name)</span></li>
+            <li><b>«Обновить файлы»</b> → <span class="ic">ListFiles()</span> — в ответ отправь список (раздел 05)</li>
+            <li><b>«Свернуть»</b> → <span class="ic">Minimize()</span>, <b>«Закрыть»</b> → <span class="ic">CloseApp()</span></li>
+            <li><b>mousedown по тайтлбару</b> → <span class="ic">DragWindow()</span> (раздел 06)</li>
+          </ul>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows;
+
+[ClassInterface(ClassInterfaceType.AutoDual)]
+[ComVisible(true)]
+public class SpectreBridge
+{
+    private readonly MainWindow _win;
+    public SpectreBridge(MainWindow win) =&gt; _win = win;
+
+    // ===== ВЫПОЛНИТЬ: сюда прилетает Lua активной вкладки =====
+    public void Execute(string lua)
+    {
+        // сюда свой инжект (pipes / DLL / ...)
+        _win.Send(new { t = "log", cls = "ok",
+            msg = $"Получено {lua.Length} символов" });
+    }
+
+    // ===== ПОДКЛЮЧИТЬ / ОТКЛЮЧИТЬ =====
+    public void Attach(int pid)
+    {
+        // Process.GetProcessesByName("RobloxPlayerBeta") ...
+    }
+    public void Detach() { }
+
+    // ===== ФАЙЛЫ (папка Scripts рядом с exe) =====
+    public void SaveFile(string name, string code)
+        =&gt; File.WriteAllText(PathOf(name), code);
+
+    public void DeleteFile(string name)
+        =&gt; File.Delete(PathOf(name));
+
+    public void ListFiles()
+    {
+        // собери список и отправь в UI (формат — раздел 05)
+    }
+
+    private string PathOf(string file)
+    {
+        var dir = Path.Combine(AppContext.BaseDirectory, "Scripts");
+        Directory.CreateDirectory(dir);
+        return Path.Combine(dir, Path.GetFileName(file)); // отрезаем ../
+    }
+
+    // ===== КНОПКИ ОКНА =====
+    public void Minimize() =&gt; _win.WindowState = WindowState.Minimized;
+    public void CloseApp() =&gt; _win.Close();
+
+    // ===== ПЕРЕТАСКИВАНИЕ ОКНА =====
+    public void DragWindow() =&gt; _win.DragMove();
+}</pre></div>
+          <div class="tip"><b>Атрибуты ComVisible/AutoDual обязательны</b> — без них WebView2 не увидит методы класса.</div>
+        </div>
+
+        <div class="dsec" id="s5">
+          <h3><span class="n">05</span>Команды WPF → UI</h3>
+          <p>Из C# в интерфейс шлём JSON через <span class="ic">Send()</span> (это <span class="ic">PostWebMessageAsString</span>). UI понимает 4 команды:</p>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>// Лог в консоль (cls: out | info | ok | warn | err | sys)
+win.Send(new { t = "log", msg = "Инжект успешен", cls = "ok" });
+
+// Открыть скрипт сразу во вкладке
+win.Send(new { t = "open", name = "fly.lua", code = "print('hi')" });
+
+// Синхронизировать список файлов (после SaveFile / ListFiles)
+win.Send(new { t = "files", list = new[] {
+    new { name = "fly.lua",  code = File.ReadAllText("Scripts/fly.lua") },
+    new { name = "esp.lua",  code = "print('esp')" }
+}});
+
+// Сменить тему из C# (те же переменные, что в панели «Темы»)
+win.Send(new { t = "theme", vars = new Dictionary&lt;string, string&gt; {
+    ["--acc"] = "#7cff3f", ["--bg"] = "#070a07", ["--bg2"] = "#0c120c"
+}});</pre></div>
+          <p>Сериализатор сам экранирует кавычки и переводы строк в Lua-коде — собирать JSON руками не нужно.</p>
+          <div class="tip"><b>Демо-режим:</b> если интерфейс открыт в обычном браузере (без WebView2), он работает локально — вызовы моста игнорируются, файлы живут в localStorage. Ничего не ломается.</div>
+        </div>
+
+        <div class="dsec" id="s6">
+          <h3><span class="n">06</span>Перетаскивание окна, когда WebView2 на весь Border</h3>
+          <p>Системной шапки нет, всё окно — это WebView2, поэтому «тайтлбар» живёт внутри веб-страницы. Схема:</p>
+          <ul>
+            <li><b>1.</b> У веб-интерфейса есть своя шапка (лого SPECTRE). Её <span class="ic">mousedown</span> вызывает <span class="ic">spectre.DragWindow()</span>.</li>
+            <li><b>2.</b> В мосте <span class="ic">DragWindow()</span> делает <span class="ic">_win.DragMove()</span>.</li>
+            <li><b>3.</b> <span class="ic">DragMove()</span> <b>блокирует UI-поток до отпускания мыши</b> — так и задумано: окно «прилипает» к курсору и следует за ним, пока кнопка не отпущена.</li>
+            <li><b>4.</b> Методы host-объекта уже выполняются в UI-потоке — <span class="ic">Dispatcher</span> не нужен.</li>
+            <li><b>5.</b> Изменение размера окна работает штатно (<span class="ic">ResizeMode="CanResize"</span>), WebView2 растягивается сам.</li>
+          </ul>
+          <div class="codeWrap"><button class="copyBtn">копировать</button><pre>// уже есть в SpectreBridge:
+public void DragWindow() =&gt; _win.DragMove();
+
+// если вдруг вызываешь не из UI-потока:
+public void DragWindow() =&gt;
+    _win.Dispatcher.Invoke(() =&gt; _win.DragMove());</pre></div>
+          <p>Кнопки <b>«Свернуть»</b> и <b>«Закрыть»</b> в шапке работают по той же схеме — они уже вызывают <span class="ic">Minimize()</span> и <span class="ic">CloseApp()</span> из раздела 04.</p>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
 
@@ -337,16 +602,17 @@ $('btnFileRefresh').addEventListener('click',function(){ call('ListFiles',[]); t
 
 /* ================= ВКЛАДКИ ================= */
 var tabs=[],active=null,seq=1;
-function getActive(){ for(var i=0;i<tabs.length;i++) if(tabs[i].id===active) return tabs[i]; return null; }
+function byId(id){ for(var i=0;i<tabs.length;i++) if(tabs[i].id===id) return tabs[i]; return null; }
+function getActive(){ return byId(active); }
 function openTab(name,content){
   name=name||'вкладка '+seq;
   if(content===undefined) content=(files[name]!==undefined)?files[name]:'';
   var t={id:'t'+(seq++)+'_'+Date.now(),name:name,content:content,dirty:false};
-  tabs.push(t); active=t.id; renderTabs(); syncEditor(); return t;
+  tabs.push(t); active=t.id; renderTabs(); syncEditor(); renderFiles(); return t;
 }
 function renderTabs(){
   $('tabsList').innerHTML=tabs.map(function(t){
-    return '<div class="tab'+(t.id===active?' active':'')+'" data-id="'+t.id+'">'+
+    return '<div class="tab'+(t.id===active?' active':'')+'" draggable="true" data-id="'+t.id+'">'+
       '<span class="tname">'+esc(t.name)+(t.dirty?' <span class="tdirty">•</span>':'')+'</span>'+
       '<button class="tx" data-x="'+t.id+'" title="Закрыть">✕</button></div>';
   }).join('');
@@ -361,23 +627,87 @@ function closeTab(id){
   if(active===id){ var n=tabs[i]||tabs[i-1]; active=n?n.id:null; }
   renderTabs(); syncEditor(); renderFiles();
 }
-$('tabbar').addEventListener('click',function(e){
+function startRename(t){
+  var el=document.querySelector('.tab[data-id="'+t.id+'"] .tname');
+  if(!el||el.querySelector('input')) return;
+  var inp=document.createElement('input'); inp.value=t.name;
+  el.innerHTML=''; el.appendChild(inp);
+  inp.focus(); inp.select();
+  var done=false;
+  function commit(){ if(done)return; done=true; t.name=inp.value.trim()||t.name; renderTabs(); renderFiles(); }
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',function(ev){ ev.stopPropagation();
+    if(ev.key==='Enter') inp.blur();
+    if(ev.key==='Escape'){ inp.value=t.name; inp.blur(); } });
+  inp.addEventListener('mousedown',function(ev){ev.stopPropagation();});
+}
+$('tabsList').addEventListener('click',function(e){
   var x=e.target.closest('[data-x]'); if(x){ closeTab(x.getAttribute('data-x')); return; }
   var tb=e.target.closest('.tab'); if(tb) setActive(tb.getAttribute('data-id'));
 });
-$('tabbar').addEventListener('dblclick',function(e){
+$('tabsList').addEventListener('dblclick',function(e){
+  if(e.target.tagName==='INPUT') return;
   var tb=e.target.closest('.tab'); if(!tb||e.target.closest('[data-x]')) return;
-  var id=tb.getAttribute('data-id'),t=null;
-  for(var i=0;i<tabs.length;i++) if(tabs[i].id===id) t=tabs[i];
-  if(!t) return;
-  var inp=document.createElement('input'); inp.value=t.name;
-  tb.querySelector('.tname').innerHTML=''; tb.querySelector('.tname').appendChild(inp);
-  inp.focus(); inp.select();
-  function commit(){ t.name=inp.value.trim()||t.name; renderTabs(); renderFiles(); }
-  inp.addEventListener('blur',commit);
-  inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter') inp.blur(); ev.stopPropagation(); });
-  inp.addEventListener('click',function(ev){ev.stopPropagation();});
+  var t=byId(tb.getAttribute('data-id')); if(t) startRename(t);
 });
+
+/* контекстное меню вкладки */
+var ctx=$('ctxMenu'),ctxTabId=null;
+$('tabsList').addEventListener('contextmenu',function(e){
+  var tb=e.target.closest('.tab'); if(!tb) return;
+  e.preventDefault(); ctxTabId=tb.getAttribute('data-id');
+  ctx.style.left=Math.min(e.clientX,innerWidth-190)+'px';
+  ctx.style.top=Math.min(e.clientY,innerHeight-140)+'px';
+  ctx.classList.add('show');
+});
+document.addEventListener('mousedown',function(e){ if(!e.target.closest('#ctxMenu')) ctx.classList.remove('show'); });
+ctx.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b) return;
+  var t=byId(ctxTabId); ctx.classList.remove('show'); if(!t) return;
+  var act=b.getAttribute('data-act');
+  if(act==='ren') startRename(t);
+  else if(act==='dup') openTab('копия '+t.name,t.content);
+  else if(act==='close') closeTab(t.id);
+});
+
+/* колесо мыши = прокрутка вкладок */
+$('tabbar').addEventListener('wheel',function(e){
+  e.preventDefault();
+  $('tabbar').scrollLeft+=e.deltaY+e.deltaX;
+},{passive:false});
+
+/* перетаскивание вкладок как в браузере */
+var dragTabId=null;
+$('tabbar').addEventListener('dragstart',function(e){
+  var tb=e.target.closest('.tab');
+  if(!tb||e.target.closest('input')||e.target.closest('button')) return;
+  dragTabId=tb.getAttribute('data-id');
+  tb.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+  try{e.dataTransfer.setData('text/plain',dragTabId);}catch(x){}
+});
+$('tabbar').addEventListener('dragover',function(e){
+  if(!dragTabId) return;
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  var over=e.target.closest('.tab');
+  if(!over||over.getAttribute('data-id')===dragTabId) return;
+  var dragEl=null,children=$('tabsList').children;
+  for(var i=0;i<children.length;i++) if(children[i].getAttribute('data-id')===dragTabId) dragEl=children[i];
+  if(!dragEl) return;
+  var r=over.getBoundingClientRect();
+  var before=e.clientX<r.left+r.width/2;
+  $('tabsList').insertBefore(dragEl,before?over:over.nextSibling);
+});
+function syncTabOrder(){
+  var order=[].map.call($('tabsList').children,function(x){return x.getAttribute('data-id');});
+  tabs.sort(function(a,b){return order.indexOf(a.id)-order.indexOf(b.id);});
+}
+$('tabbar').addEventListener('drop',function(e){ if(dragTabId){e.preventDefault(); syncTabOrder();} });
+$('tabbar').addEventListener('dragend',function(){
+  var d=document.querySelector('.tab.dragging'); if(d) d.classList.remove('dragging');
+  syncTabOrder(); dragTabId=null;
+});
+
 $('btnAddTab').addEventListener('click',function(){openTab();});
 $('btnNew').addEventListener('click',function(){openTab();});
 
@@ -536,9 +866,34 @@ $('btnThemeClose').addEventListener('click',function(){$('themePanel').classList
   if(s&&s.fs){ $('rFont').value=s.fs; $('rFontVal').textContent=s.fs; document.documentElement.style.setProperty('--fs',s.fs+'px'); }
 })();
 
+/* ================= WPF-ГИД ================= */
+var docs=$('docsModal');
+$('btnDocs').addEventListener('click',function(){docs.classList.add('show');});
+$('btnDocsClose').addEventListener('click',function(){docs.classList.remove('show');});
+docs.addEventListener('mousedown',function(e){ if(e.target===docs) docs.classList.remove('show'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ docs.classList.remove('show'); $('themePanel').classList.remove('open'); ctx.classList.remove('show'); } });
+var navBtns=[].slice.call(document.querySelectorAll('.docs-nav button'));
+navBtns.forEach(function(b){ b.addEventListener('click',function(){
+  navBtns.forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+  var s=document.getElementById(b.getAttribute('data-sec'));
+  if(s) s.scrollIntoView({behavior:'smooth',block:'start'});
+});});
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(en){ if(en.isIntersecting)
+    navBtns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sec')===en.target.id);}); });
+},{root:$('docsBody'),rootMargin:'-15% 0px -75% 0px'});
+[].forEach.call(document.querySelectorAll('.dsec'),function(s){io.observe(s);});
+$('docsBody').addEventListener('click',function(e){
+  var c=e.target.closest('.copyBtn'); if(!c) return;
+  var pre=c.parentElement.querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(function(){
+    c.textContent='готово ✓'; setTimeout(function(){c.textContent='копировать';},1200);
+  });
+});
+
 /* ================= ОКНО / DRAG&DROP ================= */
-$('btnMin').addEventListener('click',function(){ call('Minimize',[]); if(!REAL) toast('Свернуть — работает в WPF'); });
-$('btnClose').addEventListener('click',function(){ call('CloseApp',[]); if(!REAL) toast('Закрыть — работает в WPF'); });
+$('btnMin').addEventListener('click',function(){ call('Minimize',[]); if(!REAL) toast('Свернуть — работает в WPF (раздел 04 гида)'); });
+$('btnClose').addEventListener('click',function(){ call('CloseApp',[]); if(!REAL) toast('Закрыть — работает в WPF (раздел 04 гида)'); });
 $('titlebar').addEventListener('mousedown',function(e){ if(e.target.closest('button')) return; call('DragWindow',[]); });
 
 var dragDepth=0;
@@ -561,7 +916,7 @@ window.addEventListener('drop',function(e){
 persistFiles(); renderFiles();
 openTab('fly.lua');
 log(REAL?'Мост WPF найден — реальный режим':'WPF не найден — демо-режим (всё работает локально)','sys');
-log('Спектра готова. Ctrl+Enter — выполнить.','info');
+log('Спектра готова. Ctrl+Enter — выполнить, «WPF-гид» — инструкция по подключению.','info');
 </script>
 </body>
 </html>
